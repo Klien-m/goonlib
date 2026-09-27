@@ -25,9 +25,17 @@ export interface AddToCollectionProps {
 }
 
 /**
- * A small menu for filing the current item into a collection or a tag, with an
- * inline "create and add" so the first one doesn't require a detour to the
- * sidebar.
+ * A small menu for filing the current item into a collection or a tag.
+ *
+ * One box does both jobs: it narrows the list as you type, and what you typed
+ * becomes a new entry if you want it. A library with two hundred tags is not
+ * a list you scroll, and having typed the name already, being made to scroll
+ * for it is the wrong answer - so the box sits at the top, where you are
+ * looking, rather than under a list you were never meant to read.
+ *
+ * Enter on a name that already exists files into that one rather than making
+ * a second of it. The database would have matched them anyway, case and all;
+ * this just means the menu does not lie about what is happening.
  */
 export function AddToCollection(props: AddToCollectionProps): React.JSX.Element {
   const { collections, onAdd } = props
@@ -50,13 +58,20 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
 
   const multi = props.onRemove !== undefined
 
-  const create = useCallback(() => {
+  const needle = draft.trim().toLowerCase()
+  const shown = needle ? collections.filter((entry) => entry.name.toLowerCase().includes(needle)) : collections
+
+  /** The entry this exact text already names, if there is one. */
+  const already = needle ? collections.find((entry) => entry.name.toLowerCase() === needle) : undefined
+
+  const commit = useCallback(() => {
     const name = draft.trim()
     if (!name) return
-    onAdd({ name })
+    const match = collections.find((entry) => entry.name.toLowerCase() === name.toLowerCase())
+    onAdd(match ? { id: match.id } : { name })
     setDraft('')
     if (!multi) setOpen(false)
-  }, [draft, onAdd, multi])
+  }, [draft, onAdd, multi, collections])
 
   return (
     <div className="addto" ref={shellRef}>
@@ -71,10 +86,31 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
 
       {open ? (
         <div className="addto__menu" role="menu" aria-multiselectable={multi || undefined}>
+          <div className="addto__new">
+            <input
+              className="addto__input"
+              autoFocus
+              placeholder={props.placeholder ?? 'Search or add a collection'}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') commit()
+                if (event.key === 'Escape') setOpen(false)
+                // The lightbox listens for keys at the window; without this its
+                // shortcuts would fire while the user is typing a name.
+                event.stopPropagation()
+              }}
+            />
+          </div>
+
           {collections.length === 0 ? (
             <p className="addto__empty">{props.emptyText ?? 'No collections yet.'}</p>
+          ) : shown.length === 0 ? (
+            // Not an empty list: what was typed is about to become a new one,
+            // and saying "nothing matches" would hide that.
+            <p className="addto__empty">Enter to add “{draft.trim()}”.</p>
           ) : (
-            collections.map((collection) => (
+            shown.map((collection) => (
               <button
                 key={collection.id}
                 type="button"
@@ -99,21 +135,12 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
             ))
           )}
 
-          <div className="addto__new">
-            <input
-              className="addto__input"
-              placeholder={props.placeholder ?? 'New collection…'}
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') create()
-                if (event.key === 'Escape') setOpen(false)
-                // The lightbox listens for keys at the window; without this its
-                // shortcuts would fire while the user is typing a name.
-                event.stopPropagation()
-              }}
-            />
-          </div>
+          {/* Says which way Enter will go, so it is never a surprise. */}
+          {draft.trim() ? (
+            <p className="addto__hint">
+              {already ? `Enter files this into “${already.name}”.` : `Enter adds “${draft.trim()}”.`}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

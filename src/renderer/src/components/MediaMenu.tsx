@@ -231,7 +231,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
         />
         <AddToCollection
           label="Add to Tag"
-          placeholder="New tag…"
+          placeholder="Search or add a tag"
           emptyText="No tags yet."
           collections={props.tags}
           activeIds={tagIds}

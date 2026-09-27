@@ -527,7 +527,7 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
 
           <AddToCollection
             label="Add to Tag"
-            placeholder="New tag…"
+            placeholder="Search or add a tag"
             emptyText="No tags yet."
             collections={props.tags}
             activeIds={new Set(attachedTagIds(props.tags, labels))}

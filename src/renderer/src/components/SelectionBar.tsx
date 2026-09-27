@@ -131,7 +131,7 @@ export function SelectionBar({
             <AddToCollection
               collections={tags}
               label="Tag"
-              placeholder="New tag"
+              placeholder="Search or add a tag"
               emptyText="No tags yet."
               onAdd={(target) => {
                 setFiling(null)

@@ -492,10 +492,30 @@ body {
   color: var(--text-muted);
 }
 
+/*
+ * The search-and-add box, at the top of the menu and staying there.
+ *
+ * The menu scrolls, and a box that scrolled away with the list would be gone
+ * exactly when a long list makes it worth having. The negative margins pull it
+ * out to the menu's own edges so nothing passes above it on its way up.
+ */
 .addto__new {
-  margin-top: 4px;
-  padding-top: 5px;
+  position: sticky;
+  top: -5px;
+  z-index: 1;
+  margin: -5px -5px 4px;
+  padding: 5px 5px 6px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Which way Enter will go, under the list it is about to act on. */
+.addto__hint {
+  margin: 4px 0 0;
+  padding: 5px 8px 1px;
   border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .addto__input {
