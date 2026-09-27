@@ -37,6 +37,7 @@ import type {
   MediaViews,
   LibraryBreakdown,
   MediaPage,
+  ScreenshotResult,
   MoveResult,
   MediaQuery,
   Platform,
@@ -143,6 +144,8 @@ const api: GoonLibApi = {
       ipcRenderer.invoke(IPC.mediaMoveTo, mediaIds, rootId, path),
     rename: (mediaId: number, stem: string): Promise<FolderActionResult> =>
       ipcRenderer.invoke(IPC.mediaRename, mediaId, stem),
+    screenshot: (mediaId: number, positionMs: number): Promise<ScreenshotResult> =>
+      ipcRenderer.invoke(IPC.mediaScreenshot, mediaId, positionMs),
     favoriteCount: (mediaIds: number[]): Promise<number> =>
       ipcRenderer.invoke(IPC.mediaFavoriteCount, mediaIds),
     favorite: (mediaIds: number[], favorite: boolean): Promise<number> =>

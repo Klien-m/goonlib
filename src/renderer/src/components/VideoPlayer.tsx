@@ -10,6 +10,7 @@ import { correct, isRunning, projectPosition } from '@shared/drift'
 import { clamp } from '@shared/num'
 import { trace } from '../trace'
 import { formatDuration } from '../format'
+import { CameraIcon } from './SidebarIcons'
 
 export interface VideoPlayerHandle {
   togglePlay(): void
@@ -56,6 +57,12 @@ export interface VideoPlayerProps {
    * the viewer's decision, not the player's — this just reports the fact.
    */
   onEnded?: () => void
+  /**
+   * Keeps the frame on screen as a picture. Given the position in
+   * milliseconds; resolves false if it could not be kept, so the button can
+   * say so rather than claiming success.
+   */
+  onScreenshot?: (positionMs: number) => Promise<boolean> | void
   /**
    * Where the video is and whether it is moving, reported on every change and
    * once a second while playing. The toy follows the video from these.
@@ -112,6 +119,7 @@ export function VideoPlayer({
   loop = false,
   startAtMs = null,
   onEnded,
+  onScreenshot,
   onReport,
   volume: savedVolume = 1,
   muted: savedMuted = false,
@@ -137,6 +145,14 @@ export function VideoPlayer({
   const [playing, setPlaying] = useState(false)
   const [muted, setMuted] = useState(savedMuted)
   const [volume, setVolume] = useState(savedVolume)
+  /** What the keep-a-frame button is saying, which it says only briefly. */
+  const [shot, setShot] = useState<'idle' | 'working' | 'kept' | 'failed'>('idle')
+
+  useEffect(() => {
+    if (shot !== 'kept' && shot !== 'failed') return
+    const timer = setTimeout(() => setShot('idle'), shot === 'kept' ? 1600 : 3000)
+    return () => clearTimeout(timer)
+  }, [shot])
 
   // Read once, at open: the saved volume is where a video starts, not something
   // to keep re-applying while the user is changing it.
@@ -692,6 +708,35 @@ export function VideoPlayer({
         </div>
 
         <span className="controls__time">{formatDuration(duration * 1000) || '0:00'}</span>
+
+        {onScreenshot ? (
+          <button
+            type="button"
+            className="controls__button"
+            disabled={shot === 'working'}
+            onClick={() => {
+              const video = videoRef.current
+              if (!video || shot === 'working') return
+              setShot('working')
+              // The frame asked for is the frame on screen, so the position is
+              // read from the element at the moment of the click rather than
+              // from the clock, which only ticks a few times a second.
+              void Promise.resolve(onScreenshot(Math.round(video.currentTime * 1000)))
+                .then((ok) => setShot(ok === false ? 'failed' : 'kept'))
+                .catch(() => setShot('failed'))
+            }}
+            aria-label="Keep this frame as a picture"
+            title={
+              shot === 'kept'
+                ? 'Kept, beside the video'
+                : shot === 'failed'
+                  ? 'That frame could not be kept'
+                  : 'Keep this frame as a picture'
+            }
+          >
+            {shot === 'kept' ? '✓' : shot === 'failed' ? '!' : <CameraIcon />}
+          </button>
+        ) : null}
 
         <button
           type="button"

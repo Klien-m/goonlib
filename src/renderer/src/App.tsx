@@ -1308,6 +1308,10 @@ export default function App(): React.JSX.Element {
       {viewerItem ? (
         <Lightbox
           playback={playback}
+          onChanged={() => {
+            void refreshSidebar()
+            view.refresh()
+          }}
           onPlaybackChange={changePlayback}
           onVolumeChange={changeVolume}
           item={viewerItem}

@@ -303,6 +303,15 @@ export interface DuplicateReport {
   pending: number
 }
 
+/** A kept frame: the new item, or why there isn't one. */
+export interface ScreenshotResult {
+  ok: boolean
+  mediaId: number | null
+  /** The filename it was saved as, for telling the user where it went. */
+  name: string | null
+  message: string | null
+}
+
 /** What the right-click menu asks the main process to do with a file. */
 export type MediaFileAction =
   | 'copy'
@@ -1038,6 +1047,7 @@ export const IPC = {
   foldersMove: 'folders:move',
   mediaMoveTo: 'media:move-to',
   mediaRename: 'media:rename',
+  mediaScreenshot: 'media:screenshot',
   libraryBreakdown: 'library:breakdown',
   mediaFavoriteCount: 'media:favorite-count',
   updatesStatus: 'updates:status',
@@ -1203,6 +1213,11 @@ export interface GoonLibApi {
      * extension; the extension the file already has is kept.
      */
     rename(mediaId: number, stem: string): Promise<FolderActionResult>
+    /**
+     * Keeps the frame at `positionMs` as a picture beside the video, filed
+     * with the same tags, description and standing as its parent.
+     */
+    screenshot(mediaId: number, positionMs: number): Promise<ScreenshotResult>
     /**
      * Favorites or unfavorites items. Resolves with how many changed; items
      * already in the requested state are left alone, timestamp included.

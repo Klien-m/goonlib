@@ -126,6 +126,7 @@ import {
   viewsOf,
 } from './db/views'
 import { themes } from './theme'
+import { screenshotVideo } from './screenshot'
 import { trashHistory } from './trash'
 import type { TrashUndoResult, UpdateState } from '@shared/types'
 
@@ -156,6 +157,9 @@ handle(IPC.mediaFavoriteCount, (_event, mediaIds: number[]): number =>
   )
   handle(IPC.mediaRename, (_event, mediaId: number, stem: string) =>
     renameMedia(Number(mediaId), String(stem)),
+  )
+  handle(IPC.mediaScreenshot, (_event, mediaId: number, positionMs: number) =>
+    screenshotVideo(Number(mediaId), Number(positionMs) || 0),
   )
 
   handle(IPC.updatesStatus, (): UpdateState => updates.current())

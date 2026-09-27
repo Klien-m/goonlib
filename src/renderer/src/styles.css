@@ -1398,6 +1398,19 @@ body {
   background: var(--bg-hover);
 }
 
+/* The others in this row are characters; this one carries a glyph, and needs
+   centring in its own right. */
+.controls__button svg {
+  display: block;
+  margin: 0 auto;
+  color: var(--icon);
+}
+
+.controls__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .controls__time {
   flex-shrink: 0;
   min-width: 44px;

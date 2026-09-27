@@ -32,6 +32,8 @@ export interface LightboxProps {
   activeCollectionId: number | null
   onClose: () => void
   onNavigate: (delta: number) => void
+  /** Fired when the viewer changed the library, so the grid behind it re-reads. */
+  onChanged?: () => void
   onAddToCollection: (target: { id: number } | { name: string }, mediaId: number) => Promise<void> | void
   /** Takes the item out of one collection, from the viewer's own menu. */
   onLeaveCollection: (collectionId: number, mediaId: number) => Promise<void> | void
@@ -688,6 +690,17 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
               if (props.playback.autoplay) advance()
             }}
             startAtMs={startAt}
+            // The picture lands in the same folder and the same source, so the
+            // grid behind the viewer is out of date the moment it does.
+            onScreenshot={(positionMs) =>
+              window.goonlib.media
+                .screenshot(item.id, positionMs)
+                .then((result) => {
+                  if (result.ok) props.onChanged?.()
+                  return result.ok
+                })
+                .catch(() => false)
+            }
             onReport={(report) => {
               window.goonlib.toy.playback(report)
               notePosition(report)
