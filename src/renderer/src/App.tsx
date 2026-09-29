@@ -138,6 +138,7 @@ export default function App(): React.JSX.Element {
     showDescription: true,
     showCaption: true,
     showTags: true,
+    buildSprites: false,
     loop: false,
     keepHistory: true,
     resumePosition: true,

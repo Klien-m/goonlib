@@ -84,6 +84,16 @@ export function AppSettings(props: {
           disabled={!playback.showExif}
           onChange={(showLocation) => props.onPlaybackChange({ showLocation })}
         />
+
+        {/* Reading as well as writing: the scan checks it before it spends the
+            time, so a library scanned with it off has no sheets until the next
+            pass over it. */}
+        <Switch
+          label={t('App.player.buildSprites')}
+          hint={t('App.player.buildSprites.hint')}
+          checked={playback.buildSprites}
+          onChange={(buildSprites) => props.onPlaybackChange({ buildSprites })}
+        />
       </div>
 
       <WatchHistory

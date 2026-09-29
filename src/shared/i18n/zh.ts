@@ -103,6 +103,9 @@ export const zh: Catalogue = {
   'App.player.showExif.hint': '显示照片的 EXIF 信息(如果有):相机、镜头、参数和拍摄日期。',
   'App.player.showLocation': '包含位置',
   'App.player.showLocation.hint': '显示的 EXIF 信息里是否也包含位置',
+  'App.player.buildSprites': '生成悬停预览图',
+  'App.player.buildSprites.hint':
+    '生成光标在卡片上移动时逐帧擦除预览用的帧条。每个视频最多 40 次跳转和解码,是扫描中最耗时的一项,因此默认关闭。无论开关如何,视频都有封面图。',
 
   'App.history.label': '观看记录',
   'App.history.keep': '保留观看记录',

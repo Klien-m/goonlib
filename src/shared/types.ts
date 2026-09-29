@@ -355,6 +355,14 @@ export interface PlaybackPrefs {
   showCaption: boolean
   /** Of those, the tag chips. */
   showTags: boolean
+  /**
+   * Build hover-scrub sprite sheets while scanning.
+   *
+   * Off unless turned on: a sheet costs up to forty seeks and decodes per video,
+   * which is the most expensive thing the scan does and buys only the hover
+   * preview. Everything else — covers, playback — works without it.
+   */
+  buildSprites: boolean
   /** The open item repeats instead of the viewer moving on. */
   loop: boolean
   /** Count views and time watched. Off, nothing new is recorded. */
