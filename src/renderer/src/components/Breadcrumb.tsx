@@ -1,4 +1,5 @@
 import type { FolderLocation, Root } from '@shared/types'
+import { t } from '../i18n'
 
 export interface BreadcrumbProps {
   location: FolderLocation | null
@@ -23,9 +24,9 @@ export function Breadcrumb(props: BreadcrumbProps): React.JSX.Element | null {
   const segments = location.path.split('/').filter(Boolean)
 
   return (
-    <nav className="crumbs" aria-label="Folder path">
+    <nav className="crumbs" aria-label={t('Sidebar.folders.aria')}>
       <button type="button" className="crumbs__item" onClick={() => onNavigate(null)}>
-        All folders
+        {t('Crumb.all')}
       </button>
 
       <span className="crumbs__sep">/</span>

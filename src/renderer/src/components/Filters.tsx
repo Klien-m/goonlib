@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { DURATION_BANDS, SIZE_BANDS } from '@shared/types'
 import type { DurationBand, SizeBand, Tag } from '@shared/types'
 import { FunnelIcon } from './SidebarIcons'
+import { t } from '../i18n'
 
 /** What the Filters panel narrows by. Empty everywhere means no narrowing at all. */
 export interface FilterSet {
@@ -80,10 +80,10 @@ export function Filters(props: {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={count > 0 ? `Filtering by ${count}` : 'Narrow what the grid shows'}
+        title={count > 0 ? t('Filters.title.some', { count }) : t('Filters.title.none')}
       >
         <FunnelIcon />
-        Filters
+        {t('Filters.label')}
         {count > 0 ? <span className="toolbar__filter-count">{count}</span> : null}
         <span className="toolbar__sort-chevron" aria-hidden="true">
           ▾
@@ -91,22 +91,22 @@ export function Filters(props: {
       </button>
 
       {open ? (
-        <div className="addto__menu filters" role="dialog" aria-label="Filters">
+        <div className="addto__menu filters" role="dialog" aria-label={t('Filters.aria')}>
           <Band
-            title="Length"
+            title={t('Filters.group.length')}
             options={(['short', 'medium', 'long'] as const).map((band) => ({
               id: band,
-              label: DURATION_BANDS[band].label,
+              label: `Filters.band.${band}`,
             }))}
             chosen={props.filters.durations}
             onPick={(band) => props.onChange({ ...props.filters, durations: toggle(props.filters.durations, band) })}
           />
 
           <Band
-            title="Size"
+            title={t('Filters.group.size')}
             options={(['small', 'medium', 'large'] as const).map((band) => ({
               id: band,
-              label: SIZE_BANDS[band].label,
+              label: `Filters.band.${band}.size`,
             }))}
             chosen={props.filters.sizes}
             onPick={(band) => props.onChange({ ...props.filters, sizes: toggle(props.filters.sizes, band) })}
@@ -114,7 +114,7 @@ export function Filters(props: {
 
           {exts.length > 0 ? (
             <Band
-              title="File type"
+              title={t('Filters.group.type')}
               options={exts.slice(0, 14).map((entry) => ({
                 id: entry.ext,
                 label: entry.ext.replace(/^\./, '').toUpperCase(),
@@ -125,18 +125,18 @@ export function Filters(props: {
           ) : null}
 
           <div className="filters__group">
-            <span className="filters__title">Tags</span>
+            <span className="filters__title">{t('Filters.group.tags')}</span>
             <input
               className="settings__input filters__search"
               value={search}
-              placeholder="Search tags"
-              aria-label="Search tags"
+              placeholder={t('Filters.tags.search')}
+              aria-label={t('Filters.tags.search')}
               onChange={(event) => setSearch(event.target.value)}
               onKeyDown={(event) => event.stopPropagation()}
             />
             <div className="filters__chips filters__chips--tall">
               {shownTags.length === 0 ? (
-                <span className="settings__hint">No tags match.</span>
+                <span className="settings__hint">{t('Filters.tags.none')}</span>
               ) : (
                 shownTags.map((tag) => (
                   <button
@@ -157,12 +157,12 @@ export function Filters(props: {
                 ))
               )}
             </div>
-            <span className="settings__hint">Two tags means the things carrying both.</span>
+            <span className="settings__hint">{t('Filters.tags.both')}</span>
           </div>
 
           {count > 0 ? (
             <button type="button" className="button button--quiet" onClick={() => props.onChange(NO_FILTERS)}>
-              Clear filters
+              {t('Filters.clear')}
             </button>
           ) : null}
         </div>
@@ -193,7 +193,7 @@ function Band<T extends string>(props: {
             aria-pressed={props.chosen.includes(option.id)}
             onClick={() => props.onPick(option.id)}
           >
-            {option.label}
+            {t(option.label)}
           </button>
         ))}
       </div>

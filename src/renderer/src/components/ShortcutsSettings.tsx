@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { clashesWith, describeBinding, KEY_ACTIONS, bindingFromEvent } from '@shared/keys'
 import { accept, useBindings } from '../keys'
 import { IS_MAC, withTrashName } from '../platform'
+import { t } from '../i18n'
 
 /**
  * Settings → Shortcuts: the same list as the card, with every key changeable.
@@ -37,7 +38,12 @@ export function ShortcutsSettings(): React.JSX.Element {
       const clashes = clashesWith(bindings, action.context, pressed, action.id)
       if (clashes.length > 0) {
         const other = KEY_ACTIONS.find((entry) => entry.id === clashes[0])
-        setProblem(`${describeBinding(pressed, IS_MAC)} already does “${withTrashName(other?.label ?? clashes[0] ?? "")}”.`)
+        setProblem(
+          t('Shortcuts.taken', {
+            binding: describeBinding(pressed, IS_MAC),
+            other: withTrashName(t(other?.label ?? clashes[0] ?? '')),
+          }),
+        )
         setRecording(null)
         return
       }
@@ -67,17 +73,17 @@ export function ShortcutsSettings(): React.JSX.Element {
             void window.goonlib.keys.reset().then(accept).catch(() => undefined)
           }}
         >
-          Reset every shortcut
+          {t('Shortcuts.resetAll')}
         </button>
         {problem ? <span className="settings__bad">{problem}</span> : null}
       </div>
 
       {groups.map((group) => (
         <section key={group} className="settings__group">
-          <span className="settings__label">{group}</span>
+          <span className="settings__label">{t(group)}</span>
           {KEY_ACTIONS.filter((action) => action.group === group).map((action) => (
             <div key={action.id} className="shortcuts__setting">
-              <span className="shortcuts__label">{withTrashName(action.label)}</span>
+              <span className="shortcuts__label">{withTrashName(t(action.label))}</span>
               <button
                 type="button"
                 className={recording === action.id ? 'button button--on' : 'button button--quiet'}
@@ -85,20 +91,20 @@ export function ShortcutsSettings(): React.JSX.Element {
                   setProblem(null)
                   setRecording(recording === action.id ? null : action.id)
                 }}
-                title={recording === action.id ? 'Press the key you want' : 'Click, then press a key'}
+                title={recording === action.id ? t('Shortcuts.pressKey') : t('Shortcuts.clickThenPress')}
               >
                 {recording === action.id
-                  ? 'Press a key…'
+                  ? t('Shortcuts.waiting')
                   : (bindings[action.id] ?? []).length === 0
-                    ? 'Unset'
+                    ? t('Shortcuts.unset')
                     : (bindings[action.id] ?? []).map((binding) => describeBinding(binding, IS_MAC)).join('  ')}
               </button>
               <button
                 type="button"
                 className="styling__reset"
                 onClick={() => void window.goonlib.keys.set(action.id, []).then(accept).catch(() => undefined)}
-                title="Leave this without a key"
-                aria-label={`Clear ${withTrashName(action.label)}`}
+                title={t('Shortcuts.clear')}
+                aria-label={t('Shortcuts.clearAria', { label: withTrashName(t(action.label)) })}
               >
                 ×
               </button>

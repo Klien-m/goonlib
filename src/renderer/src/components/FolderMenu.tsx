@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FolderPicker } from './FolderPicker'
 import type { FolderActionResult, Root } from '@shared/types'
+import { t } from '../i18n'
 
 /** Where a folder menu was asked for, and for which folder. */
 export interface FolderMenuAt {
@@ -85,10 +86,10 @@ export function FolderMenu(props: {
           <div className="mediamenu__rule" role="separator" />
 
           <button type="button" className="mediamenu__item" role="menuitem" onClick={() => setMode('new')}>
-            New folder…
+            {t('Folder.new')}
           </button>
           <button type="button" className="mediamenu__item" role="menuitem" onClick={() => setMode('move')}>
-            Move contents to…
+            {t('Folder.moveContents')}
           </button>
 
           <div className="mediamenu__rule" role="separator" />
@@ -104,7 +105,7 @@ export function FolderMenu(props: {
                 .catch(() => setCount(0))
             }}
           >
-            {isRoot ? 'Delete source folder' : 'Delete folder'}
+            {isRoot ? t('Folder.deleteSource') : t('Folder.delete')}
           </button>
         </>
       ) : null}
@@ -117,20 +118,20 @@ export function FolderMenu(props: {
             void run(() => window.goonlib.folders.create(at.rootId, at.path, name))
           }}
         >
-          <span className="mediamenu__head">New folder in {at.name}</span>
+          <span className="mediamenu__head">{t('Folder.new.head', { name: at.name })}</span>
           <input
             className="collection__input"
             value={name}
             autoFocus
-            placeholder="Name"
+            placeholder={t('Menu.name')}
             onChange={(event) => setName(event.target.value)}
           />
           <div className="settings__row settings__row--tight">
             <button type="submit" className="button button--primary" disabled={busy || !name.trim()}>
-              Create
+              {t('Folder.create')}
             </button>
             <button type="button" className="button button--quiet" onClick={onClose}>
-              Cancel
+              {t('Folder.cancel')}
             </button>
           </div>
         </form>
@@ -138,7 +139,7 @@ export function FolderMenu(props: {
 
       {mode === 'move' ? (
         <>
-          <span className="mediamenu__head">Move everything in {at.name} to</span>
+          <span className="mediamenu__head">{t('Folder.move.head', { name: at.name })}</span>
           <div className="mediamenu__rule" role="separator" />
           <FolderPicker
             roots={props.roots}
@@ -156,15 +157,15 @@ export function FolderMenu(props: {
         <div className="mediamenu__form">
           <span className="mediamenu__head">
             {count === null
-              ? 'Counting…'
+              ? t('Folder.counting')
               : count === 0
-                ? `${at.name} is empty.`
-                : `${at.name} holds ${count} ${count === 1 ? 'item' : 'items'}.`}
+                ? t('Folder.empty', { name: at.name })
+                : count === 1
+                  ? t('Folder.holds.one', { name: at.name })
+                  : t('Folder.holds', { name: at.name, count })}
           </span>
           <span className="settings__hint">
-            {isRoot
-              ? 'The folder goes to the Trash and the source is removed from the library. This one cannot be undone from here - the folder is in the Trash if you need it back.'
-              : 'The folder and everything under it go to the Trash. Ctrl+Z puts it back.'}
+            {isRoot ? t('Folder.trash.note.source') : t('Folder.trash.note')}
           </span>
           <div className="settings__row settings__row--tight">
             <button
@@ -173,10 +174,10 @@ export function FolderMenu(props: {
               disabled={busy || count === null}
               onClick={() => void run(() => window.goonlib.folders.remove(at.rootId, at.path))}
             >
-              Move to Trash
+              {t('Folder.trash')}
             </button>
             <button type="button" className="button button--quiet" onClick={onClose}>
-              Cancel
+              {t('Folder.cancel')}
             </button>
           </div>
         </div>

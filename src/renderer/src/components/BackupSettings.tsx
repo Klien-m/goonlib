@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { t } from '../i18n'
 
 /**
  * Settings and themes, out to a file and back in.
@@ -28,24 +29,24 @@ export function BackupSettings(): React.JSX.Element {
         <button
           type="button"
           className="button"
-          onClick={() => run(() => window.goonlib.settings.export(), 'Settings written to the file.')}
-          title="Write your settings and themes to a file"
+          onClick={() => run(() => window.goonlib.settings.export(), t('Backup.export.done'))}
+          title={t('Backup.export.title')}
         >
-          Export settings…
+          {t('Backup.export')}
         </button>
         <button
           type="button"
           className="button button--quiet"
-          onClick={() => run(() => window.goonlib.settings.import(), 'Settings restored from the file.')}
-          title="Put settings and themes back from a file"
+          onClick={() => run(() => window.goonlib.settings.import(), t('Backup.import.done'))}
+          title={t('Backup.import.title')}
         >
-          Import settings…
+          {t('Backup.import')}
         </button>
       </div>
 
       {note ? <span className={note.ok ? 'settings__ok' : 'settings__bad'}>{note.text}</span> : null}
 
-      <span className="settings__hint">Preferences, toy settings and your themes, in one file.</span>
+      <span className="settings__hint">{t('Backup.hint')}</span>
     </div>
   )
 }

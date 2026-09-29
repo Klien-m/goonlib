@@ -52,6 +52,9 @@ import { useCoWatch } from './state/useCoWatch'
 import { useToy } from './state/useToy'
 import { useLibrary } from './state/useLibrary'
 import { useSelection } from './state/useSelection'
+// Redraws the whole window when the language changes. Nothing reads the value:
+// subscribing at the top is what makes every screen below speak the new one.
+import { t, useLocale } from './i18n'
 import { SelectionBar } from './components/SelectionBar'
 
 /** How long to wait after the last keystroke before querying. */
@@ -71,6 +74,8 @@ const ACTIVE_PHASES = new Set<ScanProgress['phase']>([
 
 
 export default function App(): React.JSX.Element {
+  useLocale()
+
   const [roots, setRoots] = useState<Root[]>([])
   const [stats, setStats] = useState<LibraryStats | null>(null)
   const [progress, setProgress] = useState<ScanProgress | null>(null)
@@ -396,12 +401,19 @@ export default function App(): React.JSX.Element {
       // Anything that didn't go to plan is worth saying; a clean move speaks
       // for itself once the grid updates.
       const notes = [
-        result.renamed > 0 ? `${result.renamed} renamed to avoid a clash` : null,
-        result.skipped > 0 ? `${result.skipped} already there` : null,
-        result.failed > 0 ? `${result.failed} couldn't be moved` : null,
+        result.renamed > 0 ? t('Notice.renamed', { count: result.renamed }) : null,
+        result.skipped > 0 ? t('Notice.alreadyThere', { count: result.skipped }) : null,
+        result.failed > 0 ? t('Notice.couldNotMove', { count: result.failed }) : null,
       ].filter((note): note is string => note !== null)
 
-      setError(notes.length > 0 ? `Moved to ${result.destination}: ${notes.join(', ')}.` : null)
+      setError(
+        notes.length > 0
+          ? t('Notice.moved', {
+              destination: result.destination ?? '',
+              notes: notes.join(', '),
+            })
+          : null,
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -1280,10 +1292,15 @@ export default function App(): React.JSX.Element {
                 : collectionId !== null
                   ? {
                       kind: 'collection',
-                      name: collections.find((entry) => entry.id === collectionId)?.name ?? 'This collection',
+                      name:
+                        collections.find((entry) => entry.id === collectionId)?.name ??
+                        t('Grid.thisCollection'),
                     }
                   : tagId !== null
-                    ? { kind: 'tag', name: tags.find((entry) => entry.id === tagId)?.name ?? 'This tag' }
+                    ? {
+                        kind: 'tag',
+                        name: tags.find((entry) => entry.id === tagId)?.name ?? t('Grid.thisTag'),
+                      }
                     : null
             }
             onOpen={openAt}
@@ -1452,23 +1469,24 @@ export default function App(): React.JSX.Element {
 
 /** What an undo or redo of a Delete did, in one line. */
 function trashNotice(undo: boolean, result: TrashUndoResult): string {
-  const files = (count: number): string => (count === 1 ? '1 file' : `${count} files`)
+  const files = (count: number): string =>
+    count === 1 ? t('Notice.file.one') : t('Notice.file.many', { count })
   if (result.moved === 0 && result.failed === 0) {
-    return undo ? 'Nothing to undo' : 'Nothing to redo'
+    return undo ? t('Notice.nothingUndo') : t('Notice.nothingRedo')
   }
   const done = undo
-    ? `Put back ${files(result.moved)} from the ${TRASH_NAME}`
-    : `Moved ${files(result.moved)} to the ${TRASH_NAME} again`
+    ? t('Notice.putBack', { files: files(result.moved), trash: TRASH_NAME })
+    : t('Notice.trashedAgain', { files: files(result.moved), trash: TRASH_NAME })
   if (result.failed === 0) return done
   // Windows never reports where the Recycle Bin put a file, so undo cannot find
   // it again. Saying it is gone or replaced would be wrong: it is right there,
   // waiting to be put back by hand.
   const missed = !undo
-    ? `${files(result.failed)} could not be trashed again`
+    ? t('Notice.couldNotTrashAgain', { files: files(result.failed) })
     : IS_WINDOWS
-      ? `${files(result.failed)} stayed in the ${TRASH_NAME} - Windows does not say where it put them, so put those back from there`
-      : `${files(result.failed)} could not be put back - gone from the ${TRASH_NAME}, or replaced`
-  return result.moved > 0 ? `${done}. ${missed}.` : `${missed[0]!.toUpperCase()}${missed.slice(1)}.`
+      ? t('Notice.stayedInTrash', { files: files(result.failed), trash: TRASH_NAME })
+      : t('Notice.couldNotPutBack', { files: files(result.failed), trash: TRASH_NAME })
+  return result.moved > 0 ? `${done}. ${missed}.` : missed
 }
 
 /** Remembered per machine, so Settings reopens on the tab last used. */

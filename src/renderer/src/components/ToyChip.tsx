@@ -3,6 +3,7 @@ import { customPatternId, TOY_PATTERNS } from '@shared/toy'
 import type { PatternId } from '@shared/toy'
 import type { ToyView } from '../state/useToy'
 import { describeScript, patternLabel } from './ToySections'
+import { t } from '../i18n'
 
 /**
  * The toy, wherever you are: what is driving it, a click to stop or resume,
@@ -15,7 +16,7 @@ import { describeScript, patternLabel } from './ToySections'
 export function ToyChip({ toy }: { toy: ToyView }): React.JSX.Element {
   const { status } = toy
   const running = status.manual
-  const source = describeScript(status.script) ?? 'Toy connected'
+  const source = describeScript(status.script) ?? t('Toy.chip.connected')
 
   const [open, setOpen] = useState(false)
   const shellRef = useRef<HTMLDivElement | null>(null)
@@ -51,12 +52,16 @@ export function ToyChip({ toy }: { toy: ToyView }): React.JSX.Element {
         type="button"
         className={status.armed ? 'addto__trigger toychip' : 'addto__trigger toychip toychip--stopped'}
         onClick={status.armed ? toy.stop : toy.resume}
-        title={status.armed ? `${source} - click or press X to stop` : 'Stopped - click to resume'}
+        title={
+          status.armed
+            ? t('Toy.chip.stopHint', { source })
+            : t('Toy.chip.stopped.title')
+        }
       >
         <span className="toychip__meter" aria-hidden="true">
           <span className="toychip__fill" style={{ height: `${status.level * 100}%` }} />
         </span>
-        {status.armed ? 'Stop toy' : 'Toy stopped'}
+        {status.armed ? t('Toy.chip.stop') : t('Toy.chip.stopped')}
       </button>
 
       <button
@@ -65,20 +70,24 @@ export function ToyChip({ toy }: { toy: ToyView }): React.JSX.Element {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={running ? `${patternLabel(status, running.pattern)} - pick another, or stop it` : 'Run a pattern'}
+        title={
+          running
+            ? t('Toy.chip.pickAnother', { name: patternLabel(status, running.pattern) })
+            : t('Toy.chip.run')
+        }
       >
         <span aria-hidden="true">▾</span>
-        <span className="visually-hidden">Patterns</span>
+        <span className="visually-hidden">{t('Toy.chip.patterns')}</span>
       </button>
 
       {/* The menu hangs from the chip's left edge, like the sort menu beside it. */}
       {open ? (
-        <div className="addto__menu addto__menu--narrow" role="menu" aria-label="Pattern">
+        <div className="addto__menu addto__menu--narrow" role="menu" aria-label={t('Pattern.label')}>
           {TOY_PATTERNS.map((pattern) => (
             <PatternRow
               key={pattern.id}
               glyph={pattern.glyph}
-              label={pattern.label}
+              label={t(pattern.label)}
               on={running?.pattern === pattern.id}
               disabled={!status.armed}
               onPick={() => run(pattern.id)}
@@ -107,7 +116,7 @@ export function ToyChip({ toy }: { toy: ToyView }): React.JSX.Element {
               <span className="toychip__glyph" aria-hidden="true">
                 ×
               </span>
-              <span className="addto__name">Stop pattern</span>
+              <span className="addto__name">{t('Toy.chip.stopPattern')}</span>
             </button>
           ) : null}
         </div>

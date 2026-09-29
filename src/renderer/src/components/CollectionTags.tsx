@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Tag } from '@shared/types'
 import { formatCount } from '../format'
+import { t } from '../i18n'
 
 /** Roughly what it measures, for keeping it inside the window. */
 const WIDTH = 300
@@ -89,27 +90,29 @@ export function CollectionTags(props: {
   return (
     <div className="ctags" ref={shell} style={place}>
       <div className="ctags__head">
-        <span className="settings__label">Tags included in {props.collectionName}</span>
+        <span className="settings__label">
+          {t('CollectionTags.head', { name: props.collectionName })}
+        </span>
         <button type="button" className="button button--quiet" onClick={props.onClose}>
-          Done
+          {t('CollectionTags.done')}
         </button>
       </div>
 
-      <span className="settings__hint">All media items with selected tags will be included</span>
+      <span className="settings__hint">{t('CollectionTags.hint')}</span>
 
       <input
         className="collection__input"
-        placeholder="Find a tag"
+        placeholder={t('CollectionTags.find')}
         value={filter}
         onChange={(event) => setFilter(event.target.value)}
       />
 
       <div className="ctags__list">
         {chosen === null ? (
-          <span className="settings__hint">Reading…</span>
+          <span className="settings__hint">{t('CollectionTags.reading')}</span>
         ) : shown.length === 0 ? (
           <span className="settings__hint">
-            {props.tags.length === 0 ? 'No tags yet.' : 'No tag by that name.'}
+            {props.tags.length === 0 ? t('Selection.noTags') : t('CollectionTags.noMatch')}
           </span>
         ) : (
           shown.map((tag) => (

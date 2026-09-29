@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { MediaExif, MediaItem, MediaLabel, MediaViews } from '@shared/types'
 import { formatBytes, formatDuration } from '../format'
+import { t } from '../i18n'
 
 /**
  * The open item's details, in up to two sections: Details (the file, and how
@@ -27,50 +28,69 @@ export function MediaInfo(props: {
 
   const details: Row[] = props.details
     ? [
-        ['Name', item.name],
-        ['Folder', item.relPath.includes('/') ? item.relPath.slice(0, item.relPath.lastIndexOf('/')) : null],
-        ['Type', `${item.ext.replace(/^\./, '').toUpperCase()} ${item.kind}`],
-        ['Dimensions', item.width && item.height ? `${item.width} × ${item.height}` : null],
-        ['Duration', item.durationMs ? formatDuration(item.durationMs) : null],
-        // ffprobe gives stills a frame rate and a "codec" too, which mean nothing for them.
-        ['Frame rate', item.kind === 'video' && item.fps ? `${Math.round(item.fps * 100) / 100} fps` : null],
-        ['Video', item.kind === 'video' ? item.vcodec : null],
-        ['Audio', item.kind === 'video' ? item.acodec : null],
-        ['Size', formatBytes(item.size)],
-        ['Modified', formatDate(item.mtime)],
-        ['Added', formatDate(item.addedAt)],
-        ['Favorited', item.favoritedAt !== null ? formatDate(item.favoritedAt) : null],
+        [t('Info.name'), item.name],
         [
-          'Playback',
+          t('Info.folder'),
+          item.relPath.includes('/') ? item.relPath.slice(0, item.relPath.lastIndexOf('/')) : null,
+        ],
+        [
+          t('Info.type'),
+          `${item.ext.replace(/^\./, '').toUpperCase()} ${
+            item.kind === 'video' ? t('Toolbar.kind.video') : t('Toolbar.kind.image')
+          }`,
+        ],
+        [t('Info.dimensions'), item.width && item.height ? `${item.width} × ${item.height}` : null],
+        [t('Info.duration'), item.durationMs ? formatDuration(item.durationMs) : null],
+        // ffprobe gives stills a frame rate and a "codec" too, which mean nothing for them.
+        [
+          t('Info.fps'),
+          item.kind === 'video' && item.fps ? `${Math.round(item.fps * 100) / 100} fps` : null,
+        ],
+        [t('Info.video'), item.kind === 'video' ? item.vcodec : null],
+        [t('Info.audio'), item.kind === 'video' ? item.acodec : null],
+        [t('Info.size'), formatBytes(item.size)],
+        [t('Info.modified'), formatDate(item.mtime)],
+        [t('Info.added'), formatDate(item.addedAt)],
+        [t('Info.favorited'), item.favoritedAt !== null ? formatDate(item.favoritedAt) : null],
+        [
+          t('Info.playback'),
           item.playbackTier && item.playbackTier !== 'native'
             ? item.playbackTier === 'remux'
-              ? 'Repackaged'
-              : 'Converted'
+              ? t('Info.repackaged')
+              : t('Info.converted')
             : null,
         ],
-        ['Times viewed', views ? views.viewCount.toLocaleString() : null],
+        [t('Info.views'), views ? views.viewCount.toLocaleString() : null],
         // Time spent on a still is not watching it, so only videos show it.
-        ['Time watched', item.kind === 'video' && views && views.watchMs > 0 ? formatWatched(views.watchMs) : null],
-        ['Last viewed', views?.lastViewedAt ? formatDate(views.lastViewedAt) : null],
-        ['Labels', props.labels && props.labels.length > 0 ? props.labels.map((label) => label.label).join(', ') : null],
-        ['Caption', props.caption ?? null],
+        [
+          t('Info.watched'),
+          item.kind === 'video' && views && views.watchMs > 0 ? formatWatched(views.watchMs) : null,
+        ],
+        [t('Info.lastViewed'), views?.lastViewedAt ? formatDate(views.lastViewedAt) : null],
+        [
+          t('Info.labels'),
+          props.labels && props.labels.length > 0
+            ? props.labels.map((label) => label.label).join(', ')
+            : null,
+        ],
+        [t('Info.caption'), props.caption ?? null],
       ]
     : []
 
   const camera = exif ? [exif.make, exif.model].filter(Boolean).join(' ') : ''
   const exifRows: Row[] = exif
     ? [
-        ['Camera', camera || null],
-        ['Lens', exif.lens],
-        ['Taken', exif.takenAt ? formatDate(exif.takenAt) : null],
-        ['Exposure', exif.exposure],
-        ['Aperture', exif.aperture],
+        [t('Info.camera'), camera || null],
+        [t('Info.lens'), exif.lens],
+        [t('Info.taken'), exif.takenAt ? formatDate(exif.takenAt) : null],
+        [t('Info.exposure'), exif.exposure],
+        [t('Info.aperture'), exif.aperture],
         ['ISO', exif.iso !== null ? String(exif.iso) : null],
-        ['Focal length', exif.focalLength],
-        ['Flash', exif.flash],
-        ['Software', exif.software],
+        [t('Info.focal'), exif.focalLength],
+        [t('Info.flash'), exif.flash],
+        [t('Info.software'), exif.software],
         [
-          'Location',
+          t('Info.location'),
           props.location && exif.location
             ? `${exif.location.latitude.toFixed(5)}, ${exif.location.longitude.toFixed(5)}`
             : null,
@@ -83,9 +103,9 @@ export function MediaInfo(props: {
   if (shownDetails.length === 0 && shownExif.length === 0) return null
 
   return (
-    <aside className={['mediainfo', props.className].filter(Boolean).join(' ')} aria-label="Details">
-      {shownDetails.length > 0 ? <Section title="Meta" rows={shownDetails} /> : null}
-      {shownExif.length > 0 ? <Section title="EXIF" rows={shownExif} /> : null}
+    <aside className={['mediainfo', props.className].filter(Boolean).join(' ')} aria-label={t('Info.details')}>
+      {shownDetails.length > 0 ? <Section title={t('Info.meta')} rows={shownDetails} /> : null}
+      {shownExif.length > 0 ? <Section title={t('Info.exif')} rows={shownExif} /> : null}
     </aside>
   )
 }

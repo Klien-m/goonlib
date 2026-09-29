@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MediaItem } from '@shared/types'
 import { MediaCard } from './MediaCard'
+import { t } from '../i18n'
 
 /**
  * Videos left part-way through, across the top of the library.
@@ -76,8 +77,8 @@ export function ContinueRow(props: {
   if (items.length === 0) return null
 
   return (
-    <section className="continue" aria-label="Continue watching">
-      <h2 className="continue__title">Continue watching</h2>
+    <section className="continue" aria-label={t('Continue.aria')}>
+      <h2 className="continue__title">{t('Continue.title')}</h2>
       <div ref={rowRef} className="continue__row" data-edges={edges}>
         {items.map(({ item, progress }) => (
           <div key={item.id} className="continue__card">
@@ -104,7 +105,7 @@ export function ContinueRow(props: {
                 )
                 props.onToggleFavorite?.(favourited)
               }}
-              dismissTitle="Take off Continue watching"
+              dismissTitle={t('Card.continue.dismiss')}
               onDismiss={() => {
                 // Gone from the row at once; the place itself goes in the
                 // background, since nothing here depends on the answer.

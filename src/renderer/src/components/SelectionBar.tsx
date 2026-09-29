@@ -6,6 +6,7 @@ import { MoveIcon, TrashIcon } from './SidebarIcons'
 import { formatCount } from '../format'
 import { TRASH_NAME } from '../platform'
 import type { Selection } from '../state/useSelection'
+import { t } from '../i18n'
 
 export interface SelectionBarProps {
   selection: Selection
@@ -79,15 +80,15 @@ export function SelectionBar({
 
   return (
     <div className="selbar">
-      <strong>{formatCount(selection.size)} selected</strong>
-      {selection.pending ? <span className="muted">working…</span> : null}
+      <strong>{t('Selection.selected', { count: formatCount(selection.size) })}</strong>
+      {selection.pending ? <span className="muted">{t('Selection.working')}</span> : null}
 
       <button type="button" className="button button--quiet" onClick={selection.selectAll} hidden={all}>
-        Select all
+        {t('Selection.selectAll')}
       </button>
 
       <button type="button" className="button button--quiet" onClick={selection.clear}>
-        Clear
+        {t('Selection.clear')}
       </button>
 
       <span className="selbar__spacer" />
@@ -99,15 +100,15 @@ export function SelectionBar({
           disabled={busy}
           onClick={() => setFiling(filing === 'collection' ? null : 'collection')}
         >
-          Add to Collection
+          {t('Selection.addCollection')}
         </button>
         {filing === 'collection' ? (
           <div className="selbar__picker">
             <AddToCollection
               collections={collections}
-              label="Collection"
-              placeholder="New collection"
-              emptyText="No collections yet."
+              label={t('Selection.collection')}
+              placeholder={t('Selection.newCollection')}
+              emptyText={t('Selection.noCollections')}
               onAdd={(target) => {
                 setFiling(null)
                 void Promise.resolve(onAddToCollection(target))
@@ -124,15 +125,15 @@ export function SelectionBar({
           disabled={busy}
           onClick={() => setFiling(filing === 'tag' ? null : 'tag')}
         >
-          Add to Tag
+          {t('Selection.addTag')}
         </button>
         {filing === 'tag' ? (
           <div className="selbar__picker">
             <AddToCollection
               collections={tags}
-              label="Tag"
-              placeholder="Search or add a tag"
-              emptyText="No tags yet."
+              label={t('Selection.tag')}
+              placeholder={t('Selection.searchTag')}
+              emptyText={t('Selection.noTags')}
               onAdd={(target) => {
                 setFiling(null)
                 void Promise.resolve(onAddToTag(target))
@@ -151,8 +152,8 @@ export function SelectionBar({
         aria-pressed={allFavorited}
         title={
           allFavorited
-            ? `Take ${formatCount(selection.size)} out of Favorites`
-            : `Add ${formatCount(selection.size)} to Favorites`
+            ? t('Selection.favorite.remove', { count: formatCount(selection.size) })
+            : t('Selection.favorite.add', { count: formatCount(selection.size) })
         }
       >
         <HeartIcon filled={allFavorited} size={15} />
@@ -163,7 +164,7 @@ export function SelectionBar({
         className="icon-button"
         disabled={busy || selection.size === 0}
         onClick={onMove}
-        title="Move - pick a folder and move the selected files into it"
+        title={t('Selection.move.title')}
       >
         <MoveIcon />
       </button>
@@ -173,7 +174,7 @@ export function SelectionBar({
         className="icon-button icon-button--danger"
         disabled={busy || selection.size === 0}
         onClick={onTrash}
-        title={`Trash - moves the selected files to the ${TRASH_NAME} after confirmation`}
+        title={t('Selection.trash.title', { trash: TRASH_NAME })}
       >
         <TrashIcon />
       </button>

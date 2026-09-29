@@ -4,6 +4,7 @@ import type { MediaItem } from '@shared/types'
 import type { LibraryView } from '../state/useLibrary'
 import type { Selection } from '../state/useSelection'
 import { MediaCard } from './MediaCard'
+import { t } from '../i18n'
 
 export interface MediaGridProps {
   view: LibraryView
@@ -69,7 +70,7 @@ export function MediaGrid({
   if (view.error) {
     return (
       <div className="empty" role="alert">
-        <h2 className="empty__title">Couldn&apos;t read the library</h2>
+        <h2 className="empty__title">{t('Grid.error.title')}</h2>
         <p className="empty__body">{view.error}</p>
       </div>
     )
@@ -146,11 +147,8 @@ function Empty({
   if (!hasRoots) {
     return (
       <div className="empty">
-        <h2 className="empty__title">No folders yet</h2>
-        <p className="empty__body">
-          Add a folder and GoonLib will index what&apos;s inside it. Your files stay exactly
-          where they are - nothing is moved, copied, or renamed.
-        </p>
+        <h2 className="empty__title">{t('Grid.empty.title')}</h2>
+        <p className="empty__body">{t('Grid.empty.body')}</p>
       </div>
     )
   }
@@ -158,8 +156,8 @@ function Empty({
   if (scanning) {
     return (
       <div className="empty">
-        <h2 className="empty__title">Scanning…</h2>
-        <p className="empty__body">Items will appear here as they&apos;re found.</p>
+        <h2 className="empty__title">{t('Grid.scanning.title')}</h2>
+        <p className="empty__body">{t('Grid.scanning.body')}</p>
       </div>
     )
   }
@@ -170,12 +168,14 @@ function Empty({
     return (
       <div className="empty">
         <h2 className="empty__title">
-          {emptyKind.name} is empty
+          {t(emptyKind.kind === 'collection' ? 'Grid.emptyCollection.title' : 'Grid.emptyTag.title', {
+            name: emptyKind.name,
+          })}
         </h2>
         <p className="empty__body">
-          {emptyKind.kind === 'collection'
-            ? 'Select items in the library and use Add to Collection, or right-click a single one. A collection can also gather tags: right-click it in the sidebar to choose which.'
-            : 'Select items in the library and use Add to Tag, or right-click a single one.'}
+          {t(
+            emptyKind.kind === 'collection' ? 'Grid.emptyCollection.body' : 'Grid.emptyTag.body',
+          )}
         </p>
       </div>
     )
@@ -183,8 +183,8 @@ function Empty({
 
   return (
     <div className="empty">
-      <h2 className="empty__title">Nothing matches</h2>
-      <p className="empty__body">Try a different search or filter.</p>
+      <h2 className="empty__title">{t('Grid.nothing.title')}</h2>
+      <p className="empty__body">{t('Grid.nothing.body')}</p>
     </div>
   )
 }

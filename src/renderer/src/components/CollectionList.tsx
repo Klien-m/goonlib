@@ -5,6 +5,7 @@ import type { Collection } from '@shared/types'
 import { formatCount } from '../format'
 import { CollectionsIcon } from './SidebarIcons'
 import { matchesFilter, SidebarSection, useSectionFilter } from './SidebarSection'
+import { t } from '../i18n'
 
 export interface CollectionListProps {
   collections: Collection[]
@@ -40,7 +41,7 @@ export function CollectionList(props: CollectionListProps): React.JSX.Element {
 
   return (
     <SidebarSection
-      title="Collections"
+      title={t('Sidebar.collections')}
       id="collections"
       count={shown.length}
       icon={<CollectionsIcon />}
@@ -49,7 +50,9 @@ export function CollectionList(props: CollectionListProps): React.JSX.Element {
     >
 
       {shown.length === 0 && !creating ? (
-        <p className="muted">{collections.length === 0 ? 'None yet.' : 'None of those here.'}</p>
+        <p className="muted">
+          {collections.length === 0 ? t('Section.empty.none') : t('Section.empty.hidden')}
+        </p>
       ) : (
         <ul className="collection-list collection-list--capped">
           {shown.map((collection) => (
@@ -88,12 +91,12 @@ export function CollectionList(props: CollectionListProps): React.JSX.Element {
                       event.preventDefault()
                       setTagsFor({ id: collection.id, x: event.clientX, y: event.clientY })
                     }}
-                    title={`${collection.name} - double-click to rename, right-click for its tags`}
+                    title={t('Collection.rename.title', { name: collection.name })}
                   >
                     <span className="collection__label">
                       {collection.name}
                       {collection.count > 0 && collection.aiCount === collection.count ? (
-                        <span className="tag__ai" aria-label="filed by AI">
+                        <span className="tag__ai" aria-label={t('Section.filter.ai')}>
                           ai
                         </span>
                       ) : null}
@@ -104,8 +107,8 @@ export function CollectionList(props: CollectionListProps): React.JSX.Element {
                     type="button"
                     className="root__remove"
                     onClick={() => onDelete(collection)}
-                    aria-label={`Delete the collection ${collection.name}`}
-                    title="Delete collection (your files are not touched)"
+                    aria-label={t('Collection.delete.aria', { name: collection.name })}
+                    title={t('Collection.delete.title')}
                   >
                     ×
                   </button>
@@ -129,7 +132,7 @@ export function CollectionList(props: CollectionListProps): React.JSX.Element {
       {creating ? (
         <input
           className="collection__input"
-          placeholder="Collection name"
+          placeholder={t('Selection.newCollection')}
           value={draft}
           autoFocus
           onChange={(event) => setDraft(event.target.value)}
@@ -144,7 +147,7 @@ export function CollectionList(props: CollectionListProps): React.JSX.Element {
         />
       ) : (
         <button type="button" className="button button--quiet" onClick={() => setCreating(true)}>
-          New collection
+          {t('Selection.newCollection')}
         </button>
       )}
     </SidebarSection>

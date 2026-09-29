@@ -1,4 +1,5 @@
 import { app, BrowserWindow, clipboard, dialog, ipcMain, shell, webContents } from 'electron'
+import type { Locale } from '@shared/i18n'
 import { readdir } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import type { KeyBindings } from '@shared/keys'
@@ -53,6 +54,7 @@ import type {
   ToyStatus,
 } from '@shared/types'
 import { listModels, resetClient, testConnection } from './ai/client'
+import { locales } from './locale'
 import { cowatch } from './cowatch'
 import { dbPath } from './db'
 import {
@@ -644,6 +646,16 @@ handle(IPC.collectionsTags, (_event, id: number): number[] => collectionTags(Num
     clipboard.writeText(url)
     return true
   })
+
+  // --- language --------------------------------------------------------------
+
+  handle(IPC.localeGet, (): Locale => locales.current())
+  // Synchronous, for the preload: the first render is already translated.
+  ipcMain.on(IPC.localeGet, (event) => {
+    event.returnValue = locales.current()
+  })
+  handle(IPC.localeSet, (_event, locale: Locale): Locale => locales.set(locale))
+  locales.on('change', (locale: Locale) => broadcast(IPC.localeUpdate, locale))
 
   // --- themes ----------------------------------------------------------------
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FolderLocation, FolderNode, Root } from '@shared/types'
+import { t } from '../i18n'
 
 export /**
  * The sources' folders, one level at a time, as a destination list.
@@ -60,7 +61,7 @@ function PickerNode(props: {
         <button
           type="button"
           className="foldermenu__twist"
-          aria-label={open ? 'Collapse' : 'Expand'}
+          aria-label={open ? t('Folder.collapse') : t('Folder.expand')}
           onClick={() => setOpen((was) => !was)}
         >
           {open ? '⌄' : '›'}

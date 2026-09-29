@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { PlaybackPrefs, UpdateState } from '@shared/types'
 import { Switch } from './SettingsControls'
+import { t } from '../i18n'
 
 /**
  * Settings → App → Updates: what is running, what is out, and one button that
@@ -23,11 +24,11 @@ export function UpdateSettings(props: {
 
   return (
     <div className="settings__section">
-      <span className="settings__label">Updates</span>
+      <span className="settings__label">{t('App.updates.label')}</span>
 
       <Switch
-        label="Check for updates"
-        hint="Looks for a newer version shortly after the app opens. It never downloads one without asking."
+        label={t('App.updates.check')}
+        hint={t('App.updates.check.hint')}
         checked={props.playback.autoUpdate}
         onChange={(autoUpdate) => props.onPlaybackChange({ autoUpdate })}
       />
@@ -55,7 +56,7 @@ function Action({ state }: { state: UpdateState }): React.JSX.Element | null {
     case 'downloading':
       return (
         <button type="button" className="button button--quiet" disabled>
-          Working…
+          {t('App.updates.working')}
         </button>
       )
     case 'available':
@@ -65,7 +66,7 @@ function Action({ state }: { state: UpdateState }): React.JSX.Element | null {
           className="button"
           onClick={() => void window.goonlib.updates.download().catch(() => undefined)}
         >
-          Download {state.newVersion}
+          {t('App.updates.download', { version: state.newVersion ?? '' })}
         </button>
       )
     case 'manual':
@@ -75,13 +76,13 @@ function Action({ state }: { state: UpdateState }): React.JSX.Element | null {
           className="button"
           onClick={() => void window.goonlib.updates.download().catch(() => undefined)}
         >
-          Open the release
+          {t('App.updates.openRelease')}
         </button>
       )
     case 'ready':
       return (
         <button type="button" className="button button--primary" onClick={() => window.goonlib.updates.install()}>
-          Restart to update
+          {t('App.updates.restart')}
         </button>
       )
     default:
@@ -91,7 +92,7 @@ function Action({ state }: { state: UpdateState }): React.JSX.Element | null {
           className="button button--quiet"
           onClick={() => void window.goonlib.updates.check().catch(() => undefined)}
         >
-          Check now
+          {t('App.updates.checkNow')}
         </button>
       )
   }
@@ -107,30 +108,30 @@ function Action({ state }: { state: UpdateState }): React.JSX.Element | null {
 function failure(message: string | undefined): string {
   const text = message ?? ''
   if (/unable to find latest version|cannot parse releases feed|no published versions/i.test(text)) {
-    return 'There is nothing published to update to yet.'
+    return t('App.updates.nothing')
   }
   if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|network|socket/i.test(text)) {
-    return 'Could not reach GitHub. Check your connection and try again.'
+    return t('App.updates.unreachable')
   }
-  return text || 'That did not work.'
+  return text || t('App.updates.failed')
 }
 
 function describe(state: UpdateState): string {
   switch (state.kind) {
     case 'checking':
-      return 'Looking…'
+      return t('App.updates.looking')
     case 'none':
-      return `${state.version} is the newest there is.`
+      return t('App.updates.newest', { version: state.version })
     case 'available':
-      return `${state.newVersion} is out. You are on ${state.version}.`
+      return t('App.updates.available', { new: state.newVersion ?? '', current: state.version })
     case 'downloading':
-      return `Fetching… ${state.percent ?? 0}%`
+      return t('App.updates.fetching', { percent: state.percent ?? 0 })
     case 'ready':
-      return `${state.newVersion} is ready and installs when you restart.`
+      return t('App.updates.ready', { version: state.newVersion ?? '' })
     case 'manual':
       // macOS will not replace an app it has not signed, so this build can find
       // an update but not become one.
-      return `${state.newVersion} is out, but this build cannot install it itself - macOS only replaces signed apps.`
+      return t('App.updates.manual', { version: state.newVersion ?? '' })
     case 'error':
       return failure(state.message)
     default:

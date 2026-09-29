@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { LibraryBreakdown, MediaKind, MediaQuery } from '@shared/types'
 import { formatBytes, formatCount } from '../format'
+import { t } from '../i18n'
 
 /** Roughly what it measures while shut, for keeping it inside the window. */
 const WIDTH = 420
@@ -129,7 +130,7 @@ export function StorageCard(props: {
           }))
         : (data.roots[0]?.folders ?? []).map((folder) => ({
             key: `folder-${folder.name}`,
-            label: folder.name === '' ? 'Loose files' : folder.name,
+            label: folder.name === '' ? t('Storage.loose') : folder.name,
             items: folder.items,
             bytes: folder.bytes,
             // Loose files are not a folder, so there is nowhere to go.
@@ -145,14 +146,14 @@ export function StorageCard(props: {
       ref={shell}
       style={{ ...place, maxHeight }}
       role="dialog"
-      aria-label="What this is made of"
+      aria-label={t('Storage.title')}
     >
       {failed ? (
-        <span className="settings__hint">That could not be worked out.</span>
+        <span className="settings__hint">{t('Storage.warn')}</span>
       ) : data === null ? (
-        <span className="settings__hint">Adding up…</span>
+        <span className="settings__hint">{t('Storage.loading')}</span>
       ) : data.total.items === 0 ? (
-        <span className="settings__hint">Nothing here to measure.</span>
+        <span className="settings__hint">{t('Storage.empty')}</span>
       ) : (
         <>
           <div className="storecard__head">
@@ -164,9 +165,9 @@ export function StorageCard(props: {
               library with one source, a breadcrumb saying "Everything" is a
               row of nothing. */}
           {trail.length > 0 ? (
-            <nav className="storecard__crumbs" aria-label="Where this is looking">
+            <nav className="storecard__crumbs" aria-label={t('Storage.where')}>
               <button type="button" className="storecard__crumb" onClick={() => setTrail([])}>
-                Everything
+                {t('Storage.total')}
               </button>
               {trail.map((step, index) => (
                 <span key={`${step.rootId}:${step.path}`} className="storecard__crumbs-part">
@@ -192,13 +193,13 @@ export function StorageCard(props: {
           <Donut rows={rows} lit={lit} onLight={setLit} />
 
           <Section
-            title={here === null ? 'By source' : 'Folders'}
+            title={here === null ? t('Storage.bySource') : t('Storage.folders')}
             count={rows.length}
             open={openWhere}
             onToggle={() => setOpenWhere(!openWhere)}
           >
             {rows.length === 0 ? (
-              <span className="settings__hint">Nothing filed below this.</span>
+              <span className="settings__hint">{t('Storage.nothingFiled')}</span>
             ) : (
               rows.map((row, index) => (
                 <Row
@@ -217,7 +218,7 @@ export function StorageCard(props: {
           </Section>
 
           <Section
-            title="By type"
+            title={t('Storage.byType')}
             count={data.kinds.length}
             open={openType}
             onToggle={() => setOpenType(!openType)}
@@ -230,7 +231,7 @@ export function StorageCard(props: {
                     litKind === kind.kind ? 'storecard__seg storecard__seg--lit' : 'storecard__seg'
                   }
                   style={{ background: tint(index), flexGrow: Math.max(kind.bytes, 1) }}
-                  title={`${KIND_NAME[kind.kind]}: ${formatBytes(kind.bytes)}`}
+                  title={`${t(KIND_NAME[kind.kind])}: ${formatBytes(kind.bytes)}`}
                   onMouseEnter={() => setLitKind(kind.kind)}
                   onMouseLeave={() => setLitKind(null)}
                 />
@@ -270,7 +271,10 @@ export function StorageCard(props: {
 }
 
 /** What a kind is called in the card, rather than the word the database uses. */
-const KIND_NAME: Record<MediaKind, string> = { video: 'Videos', image: 'Images' }
+const KIND_NAME: Record<MediaKind, string> = {
+  video: 'Storage.videos',
+  image: 'Storage.images',
+}
 
 /**
  * A list that starts shut, with its own count on the lid.
@@ -363,7 +367,7 @@ function Row(props: {
       type="button"
       className={classes.join(' ')}
       onClick={props.onOpen}
-      title={`Open ${props.name}`}
+      title={t('Storage.open', { name: props.name })}
       {...linking}
     >
       {inside}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { MediaItem } from '@shared/types'
+import { t } from '../i18n'
 
 export interface ImageViewerProps {
   item: MediaItem
@@ -104,7 +105,7 @@ export function ImageViewer({ item, timerSeconds = null }: ImageViewerProps): Re
   if (failed) {
     return (
       <div className="player player--message" role="alert">
-        <p className="player__headline">This image couldn&apos;t be displayed</p>
+        <p className="player__headline">{t('Image.failed')}</p>
         <p className="player__detail">{item.name}</p>
       </div>
     )

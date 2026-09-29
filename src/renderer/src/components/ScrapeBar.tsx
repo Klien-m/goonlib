@@ -1,5 +1,6 @@
 import type { ScrapeProgress } from '@shared/types'
 import { formatBytes, formatCount } from '../format'
+import { t } from '../i18n'
 
 export interface ScrapeBarProps {
   progress: ScrapeProgress
@@ -23,10 +24,10 @@ export function ScrapeBar({ progress, onCancel, onDismiss }: ScrapeBarProps): Re
   if (progress.phase === 'error') {
     return (
       <div className="scanbar scanbar--error" role="alert">
-        <span className="scanbar__label">Download failed</span>
+        <span className="scanbar__label">{t('Scrape.failed')}</span>
         <span className="scanbar__detail">{progress.message}</span>
         <button type="button" className="scanbar__cancel" onClick={onDismiss}>
-          Dismiss
+          {t('Scrape.dismiss')}
         </button>
       </div>
     )
@@ -38,7 +39,7 @@ export function ScrapeBar({ progress, onCancel, onDismiss }: ScrapeBarProps): Re
       <span className="scanbar__label">{describe(progress)}</span>
       <span className="scanbar__detail">{detail(progress)}</span>
       <button type="button" className="scanbar__cancel" onClick={active ? onCancel : onDismiss}>
-        {active ? 'Stop' : 'Dismiss'}
+        {active ? t('Scan.stop') : t('Scrape.dismiss')}
       </button>
     </div>
   )
@@ -47,24 +48,29 @@ export function ScrapeBar({ progress, onCancel, onDismiss }: ScrapeBarProps): Re
 function describe(progress: ScrapeProgress): string {
   switch (progress.phase) {
     case 'fetching':
-      return 'Reading thread'
+      return t('Scrape.reading')
     case 'downloading':
-      return `Downloading ${progress.title ?? 'thread'}`
+      return t('Scrape.downloading', { title: progress.title ?? t('Scrape.thread') })
     case 'cancelled':
-      return 'Download stopped'
+      return t('Scrape.stopped')
     default:
-      return `Downloaded ${progress.title ?? 'thread'}`
+      return t('Scrape.downloaded', { title: progress.title ?? t('Scrape.thread') })
   }
 }
 
 function detail(progress: ScrapeProgress): string {
   if (progress.phase === 'fetching') return progress.url ?? ''
 
-  const parts = [`${formatCount(progress.downloaded)} of ${formatCount(progress.total)}`]
+  const parts = [
+    t('Scrape.progress', {
+      done: formatCount(progress.downloaded),
+      total: formatCount(progress.total),
+    }),
+  ]
 
   if (progress.bytes > 0) parts.push(formatBytes(progress.bytes))
-  if (progress.skipped > 0) parts.push(`${formatCount(progress.skipped)} skipped`)
-  if (progress.failed > 0) parts.push(`${formatCount(progress.failed)} failed`)
+  if (progress.skipped > 0) parts.push(t('Scan.skipped', { count: formatCount(progress.skipped) }))
+  if (progress.failed > 0) parts.push(t('Scan.errors', { count: formatCount(progress.failed) }))
 
   return parts.join(' · ')
 }

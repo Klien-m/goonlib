@@ -21,6 +21,7 @@ import {
 import { SidebarSection } from './SidebarSection'
 import { TagList } from './TagList'
 import { GearIcon, HeartIcon } from './Toolbar'
+import { t } from '../i18n'
 
 export interface SidebarProps {
   roots: Root[]
@@ -85,7 +86,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
           type="button"
           className="sidebar__mark-button"
           onClick={playMark}
-          title="Careful senpai, I'm sensitive"
+          title={t('Sidebar.mark.title')}
           tabIndex={-1}
           aria-hidden="true"
         >
@@ -107,7 +108,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
         >
           <span className="nav-item__label">
             <HeartIcon filled={props.favorites} size={13} />
-            Favorites
+            {t('Sidebar.favorites')}
           </span>
           {props.stats ? (
             <span className="nav-item__count">{formatCount(props.stats.favorites)}</span>
@@ -133,7 +134,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
         >
           <span className="nav-item__label">
             <LibraryIcon />
-            Library
+            {t('Sidebar.library')}
           </span>
           {props.stats ? (
             <span className="nav-item__count">{formatCount(props.stats.total)}</span>
@@ -169,9 +170,9 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
 
       <hr className="sidebar__divider" />
 
-      <SidebarSection title="Folders" id="folders" icon={<FolderIcon />} active={props.location !== null}>
+      <SidebarSection title={t('Sidebar.folders')} id="folders" icon={<FolderIcon />} active={props.location !== null}>
         {props.roots.length === 0 ? (
-          <p className="muted">No folders yet. Add a source below.</p>
+          <p className="muted">{t('Sidebar.folders.empty')}</p>
         ) : (
           // A source switched off under Sources is out of the library, so it is
           // out of the folder list too.
@@ -184,7 +185,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
         )}
       </SidebarSection>
 
-      <SidebarSection title="Sources" id="sources" count={props.roots.length} icon={<SourcesIcon />}>
+      <SidebarSection title={t('Sidebar.sources')} id="sources" count={props.roots.length} icon={<SourcesIcon />}>
         {props.roots.length > 0 ? (
           <ul className="root-list">
             {props.roots.map((root) => (
@@ -203,8 +204,8 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
                   type="button"
                   className="root__remove"
                   onClick={() => props.onRemoveRoot(root.id)}
-                  aria-label={`Remove ${root.path} from the library`}
-                  title="Remove from library (your files are not touched)"
+                  aria-label={t('Sidebar.sources.remove', { path: root.path })}
+                  title={t('Sidebar.sources.remove.title')}
                 >
                   ×
                 </button>
@@ -214,7 +215,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
         ) : null}
 
         <button type="button" className="button" onClick={props.onAddRoot} disabled={props.busy}>
-          {props.busy ? 'Choosing…' : 'Add source'}
+          {props.busy ? t('Sidebar.sources.adding') : t('Sidebar.sources.add')}
         </button>
       </SidebarSection>
 
@@ -232,14 +233,12 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
           // already running is exactly when you want to hover and ask what the
           // turning icon is.
           aria-disabled={props.scanning}
-          title={
-            props.scanning
-              ? 'Scanning: looking for new, changed and removed files'
-              : 'Rescan: look for new, changed and removed files'
-          }
+          title={props.scanning ? t('Sidebar.rescan.scanning') : t('Sidebar.rescan')}
         >
           <ScanIcon />
-          <span className="visually-hidden">{props.scanning ? 'Scanning' : 'Rescan'}</span>
+          <span className="visually-hidden">
+            {props.scanning ? t('Sidebar.rescan.scanningLabel') : t('Sidebar.rescan.label')}
+          </span>
         </button>
         {/* Beside Rescan, because both are about the state of the library on
             disk rather than about what is on screen. The count is inline
@@ -260,7 +259,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
           {props.duplicates ? (
             <span className="sidebar__dupes-count">{formatCount(props.duplicates)}</span>
           ) : null}
-          <span className="visually-hidden">Duplicates</span>
+          <span className="visually-hidden">{t('Sidebar.duplicates')}</span>
         </button>
 
         {/* Sharing is not a setting. It is started, watched and stopped, so it
@@ -278,17 +277,17 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
         >
           <PeopleIcon />
           {props.knocking > 0 ? <span className="sidebar__badge">{props.knocking}</span> : null}
-          <span className="visually-hidden">Watch Together</span>
+          <span className="visually-hidden">{t('CoWatch.title')}</span>
         </button>
 
         <button
           type="button"
           className="icon-button sidebar__help"
           onClick={props.onShowShortcuts}
-          title="Keyboard shortcuts (?)"
+          title={t('Sidebar.shortcuts')}
         >
           <DescriptionIcon />
-          <span className="visually-hidden">Keyboard shortcuts</span>
+          <span className="visually-hidden">{t('Sidebar.shortcuts.label')}</span>
         </button>
 
         {/* Settings proper. It looks like every other icon here: the toy chip
@@ -302,7 +301,7 @@ export function Sidebar(props: SidebarProps): React.JSX.Element {
           title={settingsTitle(props)}
         >
           <GearIcon />
-          <span className="visually-hidden">Settings</span>
+          <span className="visually-hidden">{t('Sidebar.settings')}</span>
         </button>
       </footer>
     </aside>
@@ -318,24 +317,30 @@ function basename(path: string): string {
 function coWatchTitle(props: SidebarProps): string {
   if (props.knocking > 0) {
     return props.knocking === 1
-      ? 'Watch Together - someone is waiting to join'
-      : `Watch Together - ${props.knocking} waiting to join`
+      ? t('Sidebar.cowatch.knock.one')
+      : t('Sidebar.cowatch.knock.many', { count: props.knocking })
   }
-  return props.sharing ? 'Watch Together - sharing now' : 'Watch Together - start a session'
+  return props.sharing ? t('Sidebar.cowatch.sharing') : t('Sidebar.cowatch.start')
 }
 
 /** What the duplicates button says on hover, which depends on whether it knows yet. */
 function duplicatesTitle(count: number | null): string {
-  if (count === null) return 'Duplicates: still looking'
-  if (count === 0) return 'Duplicates: none found'
-  return `Duplicates: ${count === 1 ? '1 group' : `${count} groups`} found`
+  if (count === null) return t('Sidebar.duplicates.loading')
+  if (count === 0) return t('Sidebar.duplicates.none')
+  return count === 1
+    ? t('Sidebar.duplicates.one')
+    : t('Sidebar.duplicates.some', { count })
 }
 
 /** What the gear says on hover: Settings, and anything it is lit up about. */
 function settingsTitle(props: SidebarProps): string {
   const notes: string[] = []
-  if (props.toyLive) notes.push(props.toyStopped ? 'toy stopped' : 'toy connected')
-  return notes.length > 0 ? `Settings - ${notes.join(', ')}` : 'Settings'
+  if (props.toyLive) {
+    notes.push(props.toyStopped ? t('Sidebar.toy.stopped') : t('Sidebar.toy.connected'))
+  }
+  return notes.length > 0
+    ? t('Sidebar.settings.withToy', { notes: notes.join(', ') })
+    : t('Sidebar.settings')
 }
 
 const MARK_SOUNDS = [markSound1, markSound2, markSound3, markSound4, markSound5]

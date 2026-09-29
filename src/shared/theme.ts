@@ -59,76 +59,83 @@ export interface ThemeConfig {
 }
 
 /** How the App Styling page groups and explains the keys. */
+/**
+ * The colours a theme can set, in groups, for the Appearance page.
+ *
+ * `title` and `label` are catalogue keys rather than words: this is built at
+ * import, before anything knows which language is showing. The `key` is the
+ * CSS variable, which is not translated.
+ */
 export const THEME_GROUPS: Array<{ title: string; keys: Array<{ key: ThemeKey; label: string }> }> = [
   {
-    title: 'Base',
+    title: 'Appearance.group.base',
     keys: [
-      { key: 'background', label: 'Background' },
-      { key: 'foreground', label: 'Text' },
-      { key: 'accent', label: 'Accent' },
+      { key: 'background', label: 'Appearance.colour.background' },
+      { key: 'foreground', label: 'Appearance.colour.text' },
+      { key: 'accent', label: 'Appearance.colour.accent' },
     ],
   },
   {
-    title: 'Text and accent',
+    title: 'Appearance.group.text.and.accent',
     keys: [
-      { key: 'foreground.muted', label: 'Secondary text' },
-      { key: 'accent.foreground', label: 'Text on accent' },
-      { key: 'icon.foreground', label: 'Icons' },
+      { key: 'foreground.muted', label: 'Appearance.colour.secondary.text' },
+      { key: 'accent.foreground', label: 'Appearance.colour.text.on.accent' },
+      { key: 'icon.foreground', label: 'Appearance.colour.icons' },
     ],
   },
   {
-    title: 'Surfaces',
+    title: 'Appearance.group.surfaces',
     keys: [
-      { key: 'panel.background', label: 'Panels and menus' },
-      { key: 'panel.border', label: 'Borders' },
+      { key: 'panel.background', label: 'Appearance.colour.panels.and.menus' },
+      { key: 'panel.border', label: 'Appearance.colour.borders' },
     ],
   },
   {
-    title: 'Sidebar',
+    title: 'Appearance.group.sidebar',
     keys: [
-      { key: 'sidebar.background', label: 'Background' },
-      { key: 'sidebar.foreground', label: 'Text' },
-      { key: 'sidebar.activeBackground', label: 'Selected entry' },
+      { key: 'sidebar.background', label: 'Appearance.colour.background' },
+      { key: 'sidebar.foreground', label: 'Appearance.colour.text' },
+      { key: 'sidebar.activeBackground', label: 'Appearance.colour.selected.entry' },
     ],
   },
-  { title: 'Toolbar', keys: [{ key: 'toolbar.background', label: 'Background' }] },
+  { title: 'Appearance.group.toolbar', keys: [{ key: 'toolbar.background', label: 'Appearance.colour.background' }] },
   {
-    title: 'Lists',
+    title: 'Appearance.group.lists',
     keys: [
-      { key: 'list.hoverBackground', label: 'Under the pointer' },
-      { key: 'list.activeBackground', label: 'Selected' },
-    ],
-  },
-  {
-    title: 'Inputs',
-    keys: [
-      { key: 'input.background', label: 'Background' },
-      { key: 'input.border', label: 'Border' },
-      { key: 'input.foreground', label: 'Text' },
+      { key: 'list.hoverBackground', label: 'Appearance.colour.under.the.pointer' },
+      { key: 'list.activeBackground', label: 'Appearance.colour.selected' },
     ],
   },
   {
-    title: 'Buttons',
+    title: 'Appearance.group.inputs',
     keys: [
-      { key: 'button.background', label: 'Background' },
-      { key: 'button.foreground', label: 'Text' },
-      { key: 'button.hoverBackground', label: 'Under the pointer' },
+      { key: 'input.background', label: 'Appearance.colour.background' },
+      { key: 'input.border', label: 'Appearance.colour.border' },
+      { key: 'input.foreground', label: 'Appearance.colour.text' },
     ],
   },
   {
-    title: 'Media',
+    title: 'Appearance.group.buttons',
     keys: [
-      { key: 'card.background', label: 'Behind thumbnails' },
-      { key: 'viewer.background', label: 'Behind an open item' },
-      { key: 'player.controlsBackground', label: 'Player controls' },
+      { key: 'button.background', label: 'Appearance.colour.background' },
+      { key: 'button.foreground', label: 'Appearance.colour.text' },
+      { key: 'button.hoverBackground', label: 'Appearance.colour.under.the.pointer' },
     ],
   },
   {
-    title: 'Status',
+    title: 'Appearance.group.media',
     keys: [
-      { key: 'danger', label: 'Danger' },
-      { key: 'success', label: 'Success' },
-      { key: 'favorite', label: 'Favorite' },
+      { key: 'card.background', label: 'Appearance.colour.behind.thumbnails' },
+      { key: 'viewer.background', label: 'Appearance.colour.behind.an.open.item' },
+      { key: 'player.controlsBackground', label: 'Appearance.colour.player.controls' },
+    ],
+  },
+  {
+    title: 'Appearance.group.status',
+    keys: [
+      { key: 'danger', label: 'Appearance.colour.danger' },
+      { key: 'success', label: 'Appearance.colour.success' },
+      { key: 'favorite', label: 'Appearance.colour.favorite' },
     ],
   },
 ]

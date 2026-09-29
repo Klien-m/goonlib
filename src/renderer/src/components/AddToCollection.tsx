@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { t } from '../i18n'
 
 /** The shape this menu needs. Both `Collection` and `Tag` satisfy it. */
 export interface NamedList {
@@ -81,7 +82,7 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
       >
-        {props.label ?? 'Add to…'}
+        {props.label ?? t('AddTo.trigger')}
       </button>
 
       {open ? (
@@ -90,7 +91,7 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
             <input
               className="addto__input"
               autoFocus
-              placeholder={props.placeholder ?? 'Search or add a collection'}
+              placeholder={props.placeholder ?? t('AddTo.placeholder')}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
@@ -104,11 +105,11 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
           </div>
 
           {collections.length === 0 ? (
-            <p className="addto__empty">{props.emptyText ?? 'No collections yet.'}</p>
+            <p className="addto__empty">{props.emptyText ?? t('AddTo.empty')}</p>
           ) : shown.length === 0 ? (
             // Not an empty list: what was typed is about to become a new one,
             // and saying "nothing matches" would hide that.
-            <p className="addto__empty">Enter to add “{draft.trim()}”.</p>
+            <p className="addto__empty">{t('AddTo.enterToAdd', { name: draft.trim() })}</p>
           ) : (
             shown.map((collection) => (
               <button
@@ -138,7 +139,9 @@ export function AddToCollection(props: AddToCollectionProps): React.JSX.Element 
           {/* Says which way Enter will go, so it is never a surprise. */}
           {draft.trim() ? (
             <p className="addto__hint">
-              {already ? `Enter files this into “${already.name}”.` : `Enter adds “${draft.trim()}”.`}
+              {already
+                ? t('AddTo.enterFiles', { name: already.name })
+                : t('AddTo.enterAdds', { name: draft.trim() })}
             </p>
           ) : null}
         </div>

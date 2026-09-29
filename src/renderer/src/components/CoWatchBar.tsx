@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { COWATCH_REACTIONS } from '@shared/types'
 import type { CoWatchView } from '../state/useCoWatch'
+import { t } from '../i18n'
 
 export interface CoWatchBarProps {
   cowatch: CoWatchView
@@ -81,7 +82,7 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
       {open ? (
         <div className="cwbar__log" ref={logRef}>
           {session.chat.length === 0 ? (
-            <p className="cwbar__quiet">Nothing said yet.</p>
+            <p className="cwbar__quiet">{t('CoWatch.nothingSaid')}</p>
           ) : (
             session.chat.map((message) => (
               <p key={message.id} className="cwbar__msg">
@@ -98,7 +99,7 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
           className="cwbar__toggle"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
-          title={open ? 'Hide the conversation' : 'Show the conversation'}
+          title={open ? t('CoWatch.hideChat') : t('CoWatch.showChat')}
         >
           {open ? '▾' : '▴'}
           {!open && unread > 0 ? <span className="cwbar__unread">{unread}</span> : null}
@@ -108,10 +109,10 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
           type="button"
           className="cwbar__who"
           onClick={onOpenPanel}
-          title="Session: link, who is in, and how to stop"
+          title={t('CoWatch.bar.title')}
         >
           {session.guests.length === 0 ? (
-            <span className="cwbar__quiet">Nobody has joined</span>
+            <span className="cwbar__quiet">{t('CoWatch.nobodyJoined')}</span>
           ) : (
             session.guests.map((guest) => (
               <span key={guest.id} className="cwbar__pip">
@@ -125,7 +126,9 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
             ))
           )}
           {session.knocking.length > 0 ? (
-            <span className="cwbar__knocking">{session.knocking.length} waiting to join</span>
+            <span className="cwbar__knocking">
+              {t('CoWatch.waitingToJoin', { count: session.knocking.length })}
+            </span>
           ) : null}
         </button>
 
@@ -135,54 +138,58 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
           {control.inControl && request ? (
             <>
               <span className="cwbar__control-text">
-                <b>{request.name}</b> wants control
+                <b>{request.name}</b> {t('CoWatch.wantsControlSuffix')}
               </span>
               <button
                 type="button"
                 className="cwbar__control-button cwbar__control-button--primary"
                 onClick={() => cowatch.answerControl(request.id, true)}
               >
-                Hand over
+                {t('CoWatch.handOver')}
               </button>
               <button
                 type="button"
                 className="cwbar__control-button"
                 onClick={() => cowatch.answerControl(request.id, false)}
               >
-                Keep
+                {t('CoWatch.keep')}
               </button>
             </>
           ) : control.inControl ? (
-            <span className="cwbar__control-text">You’re in control</span>
+            <span className="cwbar__control-text">{t('CoWatch.inControl')}</span>
           ) : control.requested ? (
             <>
-              <span className="cwbar__control-text">Asked {control.controller}…</span>
+              <span className="cwbar__control-text">
+                {t('CoWatch.asked', { name: control.controller ?? '' })}
+              </span>
               <button
                 type="button"
                 className="cwbar__control-button"
                 onClick={cowatch.cancelControlRequest}
               >
-                Cancel
+                {t('Folder.cancel')}
               </button>
             </>
           ) : (
             <>
               <span className="cwbar__control-text">
-                <b>{control.controller}</b> is in control
+                <b>{control.controller}</b> {t('CoWatch.isInControlSuffix')}
               </span>
               <button
                 type="button"
                 className="cwbar__control-button cwbar__control-button--primary"
                 onClick={cowatch.requestControl}
               >
-                Ask for control
+                {t('CoWatch.askControl')}
               </button>
             </>
           )}
         </div>
 
         {waiting.length > 0 ? (
-          <span className="cwbar__holding">Holding for {waiting.join(', ')}…</span>
+          <span className="cwbar__holding">
+            {t('CoWatch.holding', { names: waiting.join(', ') })}
+          </span>
         ) : !open && latest ? (
           // Collapsed, the bar still shows the last thing said — otherwise a
           // message during a film is invisible until you go looking for it.
@@ -204,8 +211,8 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
             className="cwbar__input"
             value={draft}
             maxLength={500}
-            placeholder="Say something"
-            aria-label="Message"
+            placeholder={t('CoWatch.say')}
+            aria-label={t('CoWatch.message')}
             onChange={(event) => setDraft(event.target.value)}
             // The viewer listens for keys on the window, so Space would pause
             // the video mid-sentence and Delete would bin the thing on screen.
@@ -232,9 +239,9 @@ export function CoWatchBar({ cowatch, onOpenPanel, nudge = 0 }: CoWatchBarProps)
           type="button"
           className="cwbar__stop"
           onClick={cowatch.stop}
-          title="Stop sharing: ends the session for everyone"
+          title={t('CoWatch.stop')}
         >
-          <span aria-hidden="true">×</span> Stop Sharing
+          <span aria-hidden="true">×</span> {t('CoWatch.stopShort')}
         </button>
       </div>
     </div>

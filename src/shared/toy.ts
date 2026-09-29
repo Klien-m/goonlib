@@ -41,11 +41,11 @@ export const FULL_SPEED = 400
 
 /** Patterns anyone can pick, whether from the panel or from a guest's browser. */
 export const TOY_PATTERNS = [
-  { id: 'steady', label: 'Steady', glyph: '▬' },
-  { id: 'pulse', label: 'Pulse', glyph: '⋯' },
-  { id: 'wave', label: 'Wave', glyph: '〰' },
-  { id: 'escalate', label: 'Build', glyph: '◢' },
-  { id: 'burst', label: 'Burst', glyph: '✹' },
+  { id: 'steady', label: 'Toy.pattern.steady', glyph: '▬' },
+  { id: 'pulse', label: 'Toy.pattern.pulse', glyph: '⋯' },
+  { id: 'wave', label: 'Toy.pattern.wave', glyph: '〰' },
+  { id: 'escalate', label: 'Toy.pattern.build', glyph: '◢' },
+  { id: 'burst', label: 'Toy.pattern.burst', glyph: '✹' },
 ] as const
 
 export type ToyPattern = (typeof TOY_PATTERNS)[number]['id']
