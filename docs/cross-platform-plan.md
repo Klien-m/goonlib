@@ -54,13 +54,6 @@ ffmpeg/ffprobe - cannot be cross-built from one machine with any confidence.
 - `npmRebuild: true` stays; it is what makes better-sqlite3 match Electron.
 - The NSIS installer asks where to install rather than being one-click.
 
-The same three builds exist on CNB, in `.ci/releases/*.json`, for as long as this
-repository lives on `cnb.cool`; `.cnb.yml` is generated from them and
-`.ci/releases/README.md` says how. The CNB runs use the platform's own Linux nodes for
-Windows and Linux, and ask the root organization for a Mac node - `GOONLIB_MACOS_TAGS` -
-because this repository has none. Until one is connected, the mac build asks for an
-Intel CNB node and builds the wrong thing, which is the honest way to be wrong.
-
 ## 3. Platform behaviour - done as far as it is worth
 
 - **Undo after a delete.** `trash.ts` finds a trashed file again by device and inode, in

@@ -31,15 +31,10 @@ Both `npm test` and `npm run typecheck` are quick and neither needs a window, so
 there is no reason not to run them before pushing. `npm run build` runs typecheck
 first and fails on it.
 
-Releases are built by GitHub Actions and by CNB, on all three platforms — the
-native pieces (better-sqlite3, sharp, ffmpeg) cannot be cross-built from one
-machine with any confidence. Both push a `v*` tag and get the same three builds
-on a machine of each platform, and both attach the results to a draft release,
+Releases are built by GitHub Actions on all three platforms — the native pieces
+(better-sqlite3, sharp, ffmpeg) cannot be cross-built from one machine with any
+confidence. Pushing a `v*` tag builds and attaches the results to a draft release,
 which is published by hand.
-
-GitHub reads `.github/workflows/release.yml`; CNB reads `.cnb.yml`, which is
-*generated* from `.ci/releases/` — that directory is what to edit, and
-[`.ci/releases/README.md`](.ci/releases/README.md) says how and why.
 
 
 ### Where things live
