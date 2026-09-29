@@ -1,0 +1,27 @@
+{
+  "hidden": true,
+  "summary": "Opens the release as a draft, then collects every platform's build into it once the last one has finished.",
+  "pipeline": {
+    "name": "release-publish",
+    "docker": {
+      "image": "node:22"
+    },
+    "stages": [
+      {
+        "name": "open the draft",
+        "script": "node .cnb/tools/release.js release"
+      },
+      {
+        "name": "wait for the builds",
+        "type": "cnb:await",
+        "options": {
+          "key": "release-macos"
+        }
+      },
+      {
+        "name": "collect",
+        "script": "node .cnb/tools/release.js collect"
+      }
+    ]
+  }
+}

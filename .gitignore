@@ -5,3 +5,8 @@ release/
 .DS_Store
 *.log
 index-*.js
+
+# Compiled beside the pipeline that reads it: .ci/releases/make-cnb-yml.sh
+.cnb/pkg/
+.cnb/release
+.cnb/release-*

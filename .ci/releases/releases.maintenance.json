@@ -1,0 +1,20 @@
+{
+  "hidden": true,
+  "summary": "Rewrites .cnb.yml from the files beside it, and compiles the tool it names, so a change to the release flow is a change to a file that keeps working afterwards.",
+  "pipeline": {
+    "name": "release-config",
+    "docker": {
+      "image": "node:22"
+    },
+    "stages": [
+      {
+        "name": "write .cnb.yml",
+        "script": "bash .ci/releases/make-cnb-yml.sh"
+      }
+    ],
+    "ifModify": [
+      ".ci/releases/**",
+      ".cnb/tools/**"
+    ]
+  }
+}
