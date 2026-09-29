@@ -1,4 +1,5 @@
 import type { MediaItem } from '@shared/types'
+import { t } from '../i18n'
 import { formatDuration } from '../format'
 import { HoverScrub } from './HoverScrub'
 import { HeartIcon } from './Toolbar'
@@ -74,7 +75,7 @@ export function MediaCard({
       tabIndex={0}
       role="button"
       aria-pressed={selected}
-      aria-label={selected ? `${item.name}, selected` : `Open ${item.name}`}
+      aria-label={selected ? t('Card.selected', { name: item.name }) : t('Card.open', { name: item.name })}
     >
       <div className="card__frame">
         {hasThumb ? (
@@ -106,8 +107,8 @@ export function MediaCard({
               onDismiss()
             }}
             onKeyDown={(event) => event.stopPropagation()}
-            aria-label={dismissTitle ?? 'Remove'}
-            title={dismissTitle ?? 'Remove'}
+            aria-label={dismissTitle ?? t('Card.remove')}
+            title={dismissTitle ?? t('Card.remove')}
           >
             ×
           </button>
@@ -125,8 +126,12 @@ export function MediaCard({
             }}
             onKeyDown={(event) => event.stopPropagation()}
             aria-pressed={favorite}
-            aria-label={favorite ? `Unfavorite ${item.name}` : `Favorite ${item.name}`}
-            title={favorite ? 'Unfavorite' : 'Favorite'}
+            aria-label={
+              favorite
+                ? t('Card.unfavoriteAria', { name: item.name })
+                : t('Card.favoriteAria', { name: item.name })
+            }
+            title={favorite ? t('Card.unfavorite') : t('Card.favorite')}
           >
             <HeartIcon filled={favorite} size={14} />
           </button>
@@ -145,8 +150,12 @@ export function MediaCard({
             }}
             onKeyDown={(event) => event.stopPropagation()}
             aria-pressed={selected}
-            aria-label={selected ? `Deselect ${item.name}` : `Select ${item.name}`}
-            title={selected ? 'Deselect - shift-click for a range' : 'Select - shift-click for a range'}
+            aria-label={
+              selected
+                ? t('Card.deselectAria', { name: item.name })
+                : t('Card.selectAria', { name: item.name })
+            }
+            title={selected ? t('Card.deselect') : t('Card.select')}
           >
             {selected ? '✓' : ''}
           </button>

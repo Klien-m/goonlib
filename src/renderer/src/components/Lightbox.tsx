@@ -14,6 +14,7 @@ import { AddToCollection } from './AddToCollection'
 import { ImageViewer } from './ImageViewer'
 import { MediaInfo } from './MediaInfo'
 import { ToyChip } from './ToyChip'
+import { t } from '../i18n'
 import { UpNext } from './UpNext'
 import { actionOf } from '../keys'
 import { CameraIcon, DescriptionIcon, InfoIcon, LoopIcon } from './SidebarIcons'
@@ -461,20 +462,20 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
             className={props.playback.showMetadata ? 'icon-button icon-button--toggled' : 'icon-button'}
             onClick={() => props.onPlaybackChange({ showMetadata: !props.playback.showMetadata })}
             aria-pressed={props.playback.showMetadata}
-            title={props.playback.showMetadata ? 'Hide details' : 'Show details'}
+            title={props.playback.showMetadata ? t('Viewer.details.hide') : t('Viewer.details.show')}
           >
             <InfoIcon />
-            <span className="visually-hidden">Details</span>
+            <span className="visually-hidden">{t('Info.details')}</span>
           </button>
           <button
             type="button"
             className={props.playback.showExif ? 'icon-button icon-button--toggled' : 'icon-button'}
             onClick={() => props.onPlaybackChange({ showExif: !props.playback.showExif })}
             aria-pressed={props.playback.showExif}
-            title={props.playback.showExif ? 'Hide EXIF data' : 'Show EXIF data'}
+            title={props.playback.showExif ? t('Viewer.exif.hide') : t('Viewer.exif.show')}
           >
             <CameraIcon />
-            <span className="visually-hidden">EXIF data</span>
+            <span className="visually-hidden">{t('Viewer.exif.label')}</span>
           </button>
 
           <button
@@ -484,12 +485,12 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
             aria-pressed={props.playback.showDescription}
             title={
               props.playback.showDescription
-                ? 'Hide the description and tags'
-                : 'Show the description and tags'
+                ? t('Viewer.description.hide')
+                : t('Viewer.description.show')
             }
           >
             <DescriptionIcon />
-            <span className="visually-hidden">Description and tags</span>
+            <span className="visually-hidden">{t('Viewer.description.label')}</span>
           </button>
 
           <span className="lightbox__divider" aria-hidden="true" />
@@ -508,15 +509,15 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
             aria-pressed={props.playback.autoplay}
             title={
               props.playback.autoplay
-                ? `Moves on by itself: when a video ends, and after ${props.playback.imageSeconds}s on an image`
-                : 'Stays on each item until you move on'
+                ? t('Viewer.autoplay.moves', { seconds: props.playback.imageSeconds })
+                : t('Viewer.autoplay.stays')
             }
           >
-            {props.playback.autoplay ? 'Autoplay ✓' : 'Autoplay'}
+            {props.playback.autoplay ? t('Viewer.autoplay.on') : t('Viewer.autoplay')}
           </button>
 
           <AddToCollection
-            label="Add to Collection"
+            label={t('Selection.addCollection')}
             collections={props.collections}
             activeIds={memberOf}
             onAdd={(target) =>
@@ -528,9 +529,9 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
           />
 
           <AddToCollection
-            label="Add to Tag"
-            placeholder="Search or add a tag"
-            emptyText="No tags yet."
+            label={t('Selection.addTag')}
+            placeholder={t('Selection.searchTag')}
+            emptyText={t('Selection.noTags')}
             collections={props.tags}
             activeIds={new Set(attachedTagIds(props.tags, labels))}
             // A multi-select: a ticked tag comes off, an unticked one goes on.
@@ -544,9 +545,9 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
               type="button"
               className="addto__trigger"
               onClick={() => props.onRemoveFromCollection(item.id)}
-              title="Remove from this collection (the file itself is untouched)"
+              title={t('Viewer.collection.remove')}
             >
-              Remove
+              {t('Card.remove')}
             </button>
           ) : null}
 
@@ -562,10 +563,14 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
               }
               onClick={() => props.onToggleFavorite?.(item)}
               aria-pressed={item.favoritedAt !== null}
-              title={item.favoritedAt !== null ? 'Unfavorite (H)' : 'Favorite (H)'}
+              title={
+                item.favoritedAt !== null
+                  ? t('Viewer.favorite.on', { keys: 'H' })
+                  : t('Viewer.favorite.off', { keys: 'H' })
+              }
             >
               <HeartIcon filled={item.favoritedAt !== null} />
-              <span className="visually-hidden">Favorite</span>
+              <span className="visually-hidden">{t('Viewer.favorite')}</span>
             </button>
           ) : null}
 
@@ -575,10 +580,10 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
             className={props.playback.loop ? 'icon-button icon-button--toggled' : 'icon-button'}
             onClick={() => props.onPlaybackChange({ loop: !props.playback.loop })}
             aria-pressed={props.playback.loop}
-            title={props.playback.loop ? 'Looping this item' : 'Loop this item'}
+            title={props.playback.loop ? t('Viewer.loop.on') : t('Viewer.loop.off')}
           >
             <LoopIcon />
-            <span className="visually-hidden">Loop</span>
+            <span className="visually-hidden">{t('Viewer.loop')}</span>
           </button>
 
           <ShuffleToggle
@@ -599,8 +604,8 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
 
         <div className="lightbox__side lightbox__side--end">
           {props.coWatch ? (
-            <div className="lightbox__actor" title="Everyone in the session sees this too">
-              {props.coWatch.inControl ? 'You’re in control' : 'Watching along'}
+            <div className="lightbox__actor" title={t('Viewer.shuffleToo')}>
+              {props.coWatch.inControl ? t('Viewer.inControl') : t('Viewer.watchingAlong')}
             </div>
           ) : null}
 
@@ -615,7 +620,7 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
             type="button"
             className="lightbox__close"
             onClick={onClose}
-            aria-label="Close viewer"
+            aria-label={t('Viewer.close')}
           >
             ×
           </button>
@@ -626,7 +631,7 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
         type="button"
         className="lightbox__nav lightbox__nav--prev"
         onClick={() => onNavigate(-1)}
-        aria-label="Previous item"
+        aria-label={t('Viewer.previous')}
       >
         ‹
       </button>
@@ -728,14 +733,14 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
       ) : null}
 
       {labels.length > 0 && props.playback.showDescription && props.playback.showTags ? (
-        <div className="labels" aria-label="Tags on this item">
+        <div className="labels" aria-label={t('Viewer.tags.label')}>
           {labels.map((label) => (
             <span
               key={`${label.source}:${label.label}`}
               className={label.source === 'ai' ? 'label label--ai' : 'label'}
               title={
                 label.confidence === null
-                  ? 'Tagged by you'
+                  ? t('Viewer.tags.yours')
                   : `${Math.round(label.confidence * 100)}% confident - suggested by AI`
               }
             >
@@ -747,8 +752,8 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
                 type="button"
                 className="label__remove"
                 onClick={() => void toggleTag({ name: label.label }, true)}
-                aria-label={`Remove the tag ${label.label}`}
-                title="Remove from this item"
+                aria-label={t('Viewer.tags.remove', { label: label.label })}
+                title={t('Viewer.tags.removeItem')}
               >
                 ×
               </button>
@@ -761,7 +766,7 @@ export function Lightbox(props: LightboxProps): React.JSX.Element {
         type="button"
         className="lightbox__nav lightbox__nav--next"
         onClick={() => onNavigate(1)}
-        aria-label="Next item"
+        aria-label={t('Viewer.next')}
       >
         ›
       </button>

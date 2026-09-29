@@ -11,6 +11,7 @@ import { clamp } from '@shared/num'
 import { trace } from '../trace'
 import { formatDuration } from '../format'
 import { CameraIcon } from './SidebarIcons'
+import { t } from '../i18n'
 
 export interface VideoPlayerHandle {
   togglePlay(): void
@@ -140,7 +141,7 @@ export function VideoPlayer({
   const [status, setStatus] = useState<Status>({
     kind: 'preparing',
     percent: 0,
-    message: 'Opening…',
+    message: t('Player.opening'),
   })
   const [playing, setPlaying] = useState(false)
   const [muted, setMuted] = useState(savedMuted)
@@ -351,7 +352,7 @@ export function VideoPlayer({
     trace('[player] mount', item.id)
     let cancelled = false
 
-    setStatus({ kind: 'preparing', percent: 0, message: 'Opening…' })
+    setStatus({ kind: 'preparing', percent: 0, message: t('Player.opening') })
 
     const unsubscribe = window.goonlib.playback.onProgress((progress) => {
       if (cancelled || progress.id !== item.id) return
@@ -544,7 +545,7 @@ export function VideoPlayer({
   if (status.kind === 'error') {
     return (
       <div className="player player--message" role="alert">
-        <p className="player__headline">This video couldn&apos;t be prepared</p>
+        <p className="player__headline">{t('Player.failed')}</p>
         <p className="player__detail">{status.message}</p>
       </div>
     )
@@ -553,7 +554,7 @@ export function VideoPlayer({
   if (status.kind === 'preparing') {
     return (
       <div className="player player--message" role="status" aria-live="polite">
-        <p className="player__headline">Preparing…</p>
+        <p className="player__headline">{t('Player.preparing')}</p>
         <p className="player__detail">{status.message}</p>
         {status.percent > 0 ? (
           <>
@@ -668,8 +669,8 @@ export function VideoPlayer({
           setStatus({
             kind: 'error',
             message: media?.message
-              ? `The player rejected this file: ${media.message}`
-              : 'The player rejected this file even after preparing it.',
+              ? t('Player.rejected.why', { reason: media.message })
+              : t('Player.rejected'),
           })
         }}
       />
@@ -681,8 +682,8 @@ export function VideoPlayer({
           className="controls__button"
           onClick={togglePlay}
           disabled={locked}
-          title={locked ? 'Someone else is in control - ask for it to drive' : undefined}
-          aria-label={playing ? 'Pause' : 'Play'}
+          title={locked ? t('Player.notInControl') : undefined}
+          aria-label={playing ? t('Player.pause') : t('Player.play')}
         >
           {playing ? '❚❚' : '▶'}
         </button>
@@ -703,7 +704,7 @@ export function VideoPlayer({
             value={currentTime}
             onChange={(event) => seekTo(Number(event.target.value))}
             disabled={locked}
-            aria-label="Seek"
+            aria-label={t('Player.seek')}
           />
         </div>
 
@@ -725,13 +726,13 @@ export function VideoPlayer({
                 .then((ok) => setShot(ok === false ? 'failed' : 'kept'))
                 .catch(() => setShot('failed'))
             }}
-            aria-label="Keep this frame as a picture"
+            aria-label={t('Player.frame')}
             title={
               shot === 'kept'
-                ? 'Kept, beside the video'
+                ? t('Player.frame.kept')
                 : shot === 'failed'
-                  ? 'That frame could not be kept'
-                  : 'Keep this frame as a picture'
+                  ? t('Player.frame.failed')
+                  : t('Player.frame')
             }
           >
             {shot === 'kept' ? '✓' : shot === 'failed' ? '!' : <CameraIcon />}
@@ -742,7 +743,7 @@ export function VideoPlayer({
           type="button"
           className="controls__button"
           onClick={toggleMute}
-          aria-label={muted ? 'Unmute' : 'Mute'}
+          aria-label={muted ? t('Player.unmute') : t('Player.mute')}
         >
           {muted || volume === 0 ? '🔇' : '🔊'}
         </button>
@@ -760,14 +761,14 @@ export function VideoPlayer({
             video.volume = Number(event.target.value)
             video.muted = Number(event.target.value) === 0
           }}
-          aria-label="Volume"
+          aria-label={t('Player.volume')}
         />
 
         <button
           type="button"
           className="controls__button"
           onClick={toggleFullscreen}
-          aria-label="Toggle fullscreen"
+          aria-label={t('Player.fullscreen')}
         >
           ⛶
         </button>

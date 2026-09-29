@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CustomPattern, PatternShape, ShapePoint } from '@shared/toy'
 import { normaliseShape, SHAPE_LIMITS } from '@shared/toy'
 import type { ToyView } from '../state/useToy'
+import { t } from '../i18n'
 
 export interface PatternEditorProps {
   toy: ToyView
@@ -22,7 +23,7 @@ const PREVIEW_GAP_MS = 120
  */
 const STARTERS: Array<{ label: string; shape: PatternShape }> = [
   {
-    label: 'Wave',
+    label: 'Pattern.shape.wave',
     shape: {
       durationMs: 2000,
       points: Array.from({ length: 9 }, (_, i) => ({
@@ -32,11 +33,11 @@ const STARTERS: Array<{ label: string; shape: PatternShape }> = [
     },
   },
   {
-    label: 'Ramp',
+    label: 'Pattern.shape.ramp',
     shape: { durationMs: 5000, points: [{ at: 0, level: 0.1 }, { at: 5000, level: 1 }] },
   },
   {
-    label: 'Pulse',
+    label: 'Pattern.shape.pulse',
     shape: {
       durationMs: 1000,
       points: [
@@ -48,7 +49,7 @@ const STARTERS: Array<{ label: string; shape: PatternShape }> = [
     },
   },
   {
-    label: 'Heartbeat',
+    label: 'Pattern.shape.heartbeat',
     shape: {
       durationMs: 1200,
       points: [
@@ -252,7 +253,7 @@ export function PatternEditor({
     const clean = normaliseShape(shape)
     if (!clean) return
     void toy
-      .savePattern({ id, name: name.trim() || 'Untitled pattern', ...clean })
+      .savePattern({ id, name: name.trim() || t('Pattern.untitled'), ...clean })
       .then((stored) => {
         setId(stored.id)
         setName(stored.name)
@@ -267,14 +268,14 @@ export function PatternEditor({
 
   return (
     <div className="settings__group pattern">
-      <h3 className="pattern__title">{initial ? 'Edit pattern' : 'New pattern'}</h3>
+      <h3 className="pattern__title">{initial ? t('Pattern.edit') : t('Pattern.new')}</h3>
 
       <input
         className="settings__input"
         value={name}
         maxLength={SHAPE_LIMITS.maxName}
-        placeholder="Name your pattern"
-        aria-label="Pattern name"
+        placeholder={t('Pattern.name')}
+        aria-label={t('Pattern.name.placeholder')}
         onChange={(event) => {
           setName(event.target.value)
           setSaved(false)
@@ -287,12 +288,12 @@ export function PatternEditor({
           className={previewing ? 'button button--danger' : 'button'}
           onClick={togglePreview}
           disabled={!toy.status.armed}
-          title={toy.status.armed ? undefined : 'The toy is stopped - resume it to preview'}
+          title={toy.status.armed ? undefined : t('Pattern.stopped')}
         >
-          {previewing ? 'Stop preview' : 'Preview'}
+          {previewing ? t('Pattern.stopPreview') : t('Pattern.preview')}
         </button>
         <button type="button" className="button" onClick={save} disabled={saved}>
-          {saved ? 'Saved' : 'Save'}
+          {saved ? t('Pattern.saved') : t('Pattern.save')}
         </button>
         {id !== undefined ? (
           confirmDelete ? (
@@ -304,16 +305,16 @@ export function PatternEditor({
                 onDone()
               }}
             >
-              Really delete?
+              {t('Pattern.reallyDelete')}
             </button>
           ) : (
             <button type="button" className="button button--quiet" onClick={() => setConfirmDelete(true)}>
-              Delete
+              {t('Pattern.delete')}
             </button>
           )
         ) : null}
         <button type="button" className="button pattern__close" onClick={onDone}>
-          Close
+          {t('Shortcuts.card.close')}
         </button>
       </div>
 
@@ -321,8 +322,8 @@ export function PatternEditor({
 
       {!initial && id === undefined ? (
         <div className="settings__field">
-          <span className="settings__label">Pattern</span>
-          <div className="toy__patterns" role="group" aria-label="Start from">
+          <span className="settings__label">{t('Pattern.label')}</span>
+          <div className="toy__patterns" role="group" aria-label={t('Pattern.startFrom')}>
             {STARTERS.map((starter) => (
               <button
                 key={starter.label}
@@ -330,7 +331,7 @@ export function PatternEditor({
                 className="cowatch__provider"
                 onClick={() => change(starter.shape)}
               >
-                {starter.label}
+                {t(starter.label)}
               </button>
             ))}
           </div>
@@ -376,7 +377,10 @@ export function PatternEditor({
             onDoubleClick={() => remove(index)}
             onKeyDown={(event) => onHandleKey(event, index)}
             onFocus={() => setSelected(index)}
-            aria-label={`Point at ${(point.at / 1000).toFixed(2)} seconds, ${Math.round(point.level * 100)}%`}
+            aria-label={t('Pattern.point', {
+              seconds: (point.at / 1000).toFixed(2),
+              percent: Math.round(point.level * 100),
+            })}
           />
         ))}
 
@@ -385,13 +389,11 @@ export function PatternEditor({
         ) : null}
       </div>
 
-      <p className="settings__hint">
-        Click to add a point, drag to move one, click and press Delete to remove it.
-      </p>
+      <p className="settings__hint">{t('Pattern.hint')}</p>
 
       <label className="settings__field">
         <span className="settings__row">
-          <span className="settings__label">Duration</span>
+          <span className="settings__label">{t('Pattern.duration')}</span>
           <span className="settings__value">{seconds.toFixed(1)}s</span>
         </span>
         <input

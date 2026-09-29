@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ScanProgress } from '@shared/types'
 import { formatCount } from '../format'
+import { t } from '../i18n'
 
 /** How long "all done" stays up before the bar goes away. */
 const SETTLE_MS = 3_000
@@ -73,7 +74,7 @@ export function ScanBar({ progress, onCancel }: ScanBarProps): React.JSX.Element
           ✓
         </span>
         <span className="scanbar__label">
-          {settling === 'cancelled' ? 'Scan stopped' : 'All sources scanned'}
+          {settling === 'cancelled' ? t('Scan.cancelled') : t('Scan.done')}
         </span>
         <span className="scanbar__detail">{finished(progress)}</span>
       </div>
@@ -83,7 +84,7 @@ export function ScanBar({ progress, onCancel }: ScanBarProps): React.JSX.Element
   if (progress.phase === 'error') {
     return (
       <div className="scanbar scanbar--error" role="alert">
-        <span className="scanbar__label">Scan failed</span>
+        <span className="scanbar__label">{t('Scan.failed')}</span>
         <span className="scanbar__detail">{progress.message}</span>
       </div>
     )
@@ -95,7 +96,7 @@ export function ScanBar({ progress, onCancel }: ScanBarProps): React.JSX.Element
       <span className="scanbar__label">{describe(progress)}</span>
       <span className="scanbar__detail">{detail(progress)}</span>
       <button type="button" className="scanbar__cancel" onClick={onCancel}>
-        Stop
+        {t('Scan.stop')}
       </button>
     </div>
   )
@@ -104,19 +105,19 @@ export function ScanBar({ progress, onCancel }: ScanBarProps): React.JSX.Element
 function describe(progress: ScanProgress): string {
   switch (progress.phase) {
     case 'walking':
-      return 'Finding files'
+      return t('Scan.finding')
     case 'probing':
-      return 'Reading metadata'
+      return t('Scan.probing')
     case 'thumbnailing':
-      return 'Making thumbnails'
+      return t('Scan.thumbnailing')
     case 'previewing':
-      return 'Building previews'
+      return t('Scan.previewing')
     case 'hashing':
-      return 'Fingerprinting'
+      return t('Scan.hashing')
     case 'classifying':
-      return 'Classification'
+      return t('Scan.classifying')
     default:
-      return 'Scanning'
+      return t('Scan.scanning')
   }
 }
 
@@ -125,29 +126,29 @@ function detail(progress: ScanProgress): string {
 
   switch (progress.phase) {
     case 'walking':
-      parts.push(`${formatCount(progress.discovered)} found`)
+      parts.push(t('Scan.found', { count: formatCount(progress.discovered) }))
       if (progress.currentRoot) parts.push(progress.currentRoot)
       break
     case 'probing':
-      parts.push(`${formatCount(progress.pendingProbe)} to go`)
+      parts.push(t('Scan.toGo', { count: formatCount(progress.pendingProbe) }))
       break
     case 'thumbnailing':
-      parts.push(`${formatCount(progress.pendingThumb)} to go`)
+      parts.push(t('Scan.toGo', { count: formatCount(progress.pendingThumb) }))
       break
     case 'previewing':
-      parts.push(`${formatCount(progress.pendingSprite)} to go`)
+      parts.push(t('Scan.toGo', { count: formatCount(progress.pendingSprite) }))
       break
     case 'hashing':
-      parts.push(`${formatCount(progress.pendingHash)} to go`)
+      parts.push(t('Scan.toGo', { count: formatCount(progress.pendingHash) }))
       break
     case 'classifying':
-      parts.push(`${formatCount(progress.pendingClassify)} to go`)
+      parts.push(t('Scan.toGo', { count: formatCount(progress.pendingClassify) }))
       break
     default:
       break
   }
 
-  if (progress.errors > 0) parts.push(`${formatCount(progress.errors)} skipped`)
+  if (progress.errors > 0) parts.push(t('Scan.skipped', { count: formatCount(progress.errors) }))
 
   return parts.join(' · ')
 }
@@ -155,8 +156,8 @@ function detail(progress: ScanProgress): string {
 /** What a finished scan found, in one phrase. */
 function finished(progress: ScanProgress): string {
   const parts: string[] = []
-  if (progress.discovered > 0) parts.push(`${formatCount(progress.discovered)} found`)
-  if (progress.thumbed > 0) parts.push(`${formatCount(progress.thumbed)} thumbnailed`)
-  if (progress.errors > 0) parts.push(`${formatCount(progress.errors)} failed`)
-  return parts.length > 0 ? parts.join(' · ') : 'Nothing new'
+  if (progress.discovered > 0) parts.push(t('Scan.found', { count: formatCount(progress.discovered) }))
+  if (progress.thumbed > 0) parts.push(t('Scan.thumbnailed', { count: formatCount(progress.thumbed) }))
+  if (progress.errors > 0) parts.push(t('Scan.errors', { count: formatCount(progress.errors) }))
+  return parts.length > 0 ? parts.join(' · ') : t('Scan.nothingNew')
 }

@@ -3,6 +3,7 @@ import type { CoWatchGuest, CoWatchKnock, CoWatchTunnelProvider } from '@shared/
 import { CLOUDFLARED_INSTALL, IS_WINDOWS } from '../platform'
 import type { CoWatchView } from '../state/useCoWatch'
 import { PeopleIcon } from './SidebarIcons'
+import { t } from '../i18n'
 
 export interface CoWatchSectionProps {
   cowatch: CoWatchView
@@ -25,22 +26,23 @@ type Reach = CoWatchTunnelProvider | 'lan'
 /** How to get cloudflared, in the words of this platform. */
 const CLOUDFLARED_NOTE: React.ReactNode = CLOUDFLARED_INSTALL ? (
   <>
-    No account needed. Install with: <code className="settings__code">{CLOUDFLARED_INSTALL}</code>
+    {t('CoWatch.cloudflared.install', { command: '' })}
+    <code className="settings__code">{CLOUDFLARED_INSTALL}</code>
   </>
 ) : (
-  <>No account needed. Install cloudflared from your package manager or Cloudflare&apos;s downloads.</>
+  <>{t('CoWatch.cloudflared.note')}</>
 )
 
 const CLOUDFLARED_TITLE = CLOUDFLARED_INSTALL
-  ? `No account needed. Install with: ${CLOUDFLARED_INSTALL}`
-  : "No account needed. Install cloudflared from your package manager or Cloudflare's downloads."
+  ? t('CoWatch.cloudflared.install', { command: CLOUDFLARED_INSTALL })
+  : t('CoWatch.cloudflared.note')
 
 const PROVIDERS: Array<{ id: Reach; label: string; note: React.ReactNode; title: string }> = [
   {
     id: 'auto',
-    label: 'Automatic',
+    label: 'CoWatch.auto',
     note: null,
-    title: 'Uses whichever is installed',
+    title: 'CoWatch.auto.note',
   },
   {
     id: 'cloudflared',
@@ -53,12 +55,13 @@ const PROVIDERS: Array<{ id: Reach; label: string; note: React.ReactNode; title:
     label: 'ngrok',
     note: (
       <>
-        Needs a free account: <code className="settings__code">ngrok config add-authtoken &lt;token&gt;</code>
+        {t('CoWatch.ngrok.noteBefore')}
+        <code className="settings__code">ngrok config add-authtoken &lt;token&gt;</code>
       </>
     ),
-    title: 'Needs a free account: ngrok config add-authtoken <token>',
+    title: t('CoWatch.ngrok.note'),
   },
-  { id: 'lan', label: 'LAN', note: null, title: 'Only reachable on your own network' },
+  { id: 'lan', label: 'LAN', note: null, title: 'CoWatch.lan.note' },
 ]
 
 function noteFor(id: Reach): React.ReactNode {
@@ -99,10 +102,14 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
 
         {!session.active ? (
           <div>
-            <span className="settings__label">Sessions</span>
+            <span className="settings__label">{t('CoWatch.sessions')}</span>
 
             <div className="cowatch__start">
-              <div className="cowatch__providers" role="group" aria-label="Where guests can reach it from">
+              <div
+                className="cowatch__providers"
+                role="group"
+                aria-label={t('CoWatch.reach')}
+              >
                 {PROVIDERS.map((option) => {
                   const installed =
                     option.id === 'lan'
@@ -122,9 +129,13 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
                       }
                       aria-pressed={provider === option.id}
                       onClick={() => setProvider(option.id)}
-                      title={installed === false ? `${option.label} is not installed` : option.title}
+                      title={
+                        installed === false
+                          ? t('CoWatch.notInstalled', { name: option.label })
+                          : t(option.title)
+                      }
                     >
-                      {option.label}
+                      {t(option.label)}
                       {installed === null ? null : (
                         <span className={installed ? 'cowatch__tick' : 'cowatch__tick--missing'}>
                           {installed ? '✓' : '-'}
@@ -138,7 +149,9 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
               {provider === 'lan' || (session.available.length > 0 && !noteFor(provider)) ? null : (
                 <p className="settings__hint">
                   {session.available.length === 0 ? (
-                    <>Neither is installed. {CLOUDFLARED_NOTE}</>
+                    <>
+                      {t('CoWatch.neitherInstalled')} {CLOUDFLARED_NOTE}
+                    </>
                   ) : (
                     noteFor(provider)
                   )}
@@ -146,14 +159,11 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
               )}
 
               {provider === 'lan' ? null : (
-                <p className="settings__hint">Works anywhere, through a tunnel on your own machine.</p>
+                <p className="settings__hint">{t('CoWatch.tunnelNote')}</p>
               )}
 
               {IS_WINDOWS ? (
-                <p className="settings__hint">
-                  Starting a session opens a port, so Windows asks about its firewall the first time.
-                  Allow it on private networks.
-                </p>
+                <p className="settings__hint">{t('CoWatch.windowsFirewall')}</p>
               ) : null}
 
               <button
@@ -163,7 +173,7 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
                 onClick={() => (provider === 'lan' ? cowatch.start('lan') : cowatch.start('tunnel', provider))}
               >
                 <PeopleIcon />
-                Start a session
+                {t('CoWatch.startSession')}
               </button>
             </div>
           </div>
@@ -178,14 +188,14 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
             ) : null}
 
             <div className="settings__group">
-              <span className="settings__label">The link to send them</span>
+              <span className="settings__label">{t('CoWatch.link')}</span>
               <div className="settings__row">
                 <input
                   className="settings__input"
                   readOnly
-                  value={session.url ?? 'Getting a link…'}
+                  value={session.url ?? t('CoWatch.link.getting')}
                   onFocus={(event) => event.currentTarget.select()}
-                  aria-label="Invite link"
+                  aria-label={t('CoWatch.invite')}
                 />
                 <button
                   type="button"
@@ -193,16 +203,16 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
                   onClick={copy}
                   disabled={!session.url}
                 >
-                  {copied ? 'Copied' : 'Copy'}
+                  {copied ? t('CoWatch.copied') : t('CoWatch.copy')}
                 </button>
               </div>
 
               {session.tunnel === 'starting' ? (
-                <p className="settings__hint">Opening a public address…</p>
+                <p className="settings__hint">{t('CoWatch.opening')}</p>
               ) : null}
               {session.tunnel === 'up' ? (
                 <p className="settings__ok">
-                  Reachable from anywhere via {session.tunnelKind}. Dies when you stop.
+                  {t('CoWatch.reachable', { kind: session.tunnelKind ?? '' })}
                 </p>
               ) : null}
               {session.tunnel === 'error' ? (
@@ -210,17 +220,16 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
               ) : null}
             </div>
 
-            <p className="cowatch__warning">
-              Anyone you let in can browse your whole library - every folder, name and caption, not
-              just what&apos;s on screen. Only let in people you would hand the laptop to.
-            </p>
+            <p className="cowatch__warning">{t('CoWatch.warning')}</p>
 
             <div className="settings__group">
               <span className="settings__label">
-                In the session{session.guests.length > 0 ? ` · ${session.guests.length}` : ''}
+                {session.guests.length > 0
+                  ? t('CoWatch.inSession.count', { count: session.guests.length })
+                  : t('CoWatch.inSession')}
               </span>
               {session.guests.length === 0 ? (
-                <p className="settings__hint">Nobody yet. They&apos;ll appear here when they join.</p>
+                <p className="settings__hint">{t('CoWatch.nobody')}</p>
               ) : (
                 session.guests.map((guest) => (
                   <GuestRow key={guest.id} guest={guest} onKick={() => cowatch.kick(guest.id)} />
@@ -235,11 +244,9 @@ export function CoWatchSection({ cowatch }: CoWatchSectionProps): React.JSX.Elem
                 disabled={cowatch.busy}
                 onClick={() => cowatch.stop()}
               >
-                Stop sharing
+                {t('CoWatch.stopShort')}
               </button>
-              <p className="settings__hint">
-                Closes the door, signs everyone out, and takes the link down.
-              </p>
+              <p className="settings__hint">{t('CoWatch.stopNote')}</p>
             </div>
           </div>
         )}
@@ -259,25 +266,23 @@ function Knock({ knock, cowatch }: { knock: CoWatchKnock; cowatch: CoWatchView }
   return (
     <div className="cowatch__knock">
       <div className="cowatch__knock-who">
-        <strong>{knock.name}</strong> wants to join
-        <span className="cowatch__addr">from {knock.address}</span>
+        <strong>{knock.name}</strong> {t('CoWatch.wantsJoinSuffix')}
+        <span className="cowatch__addr">{t('CoWatch.knockFrom', { address: knock.address })}</span>
       </div>
 
       <div className="cowatch__fingerprint">{knock.fingerprint}</div>
-      <p className="settings__hint">
-        Check they can see those two words before letting them in.
-      </p>
+      <p className="settings__hint">{t('CoWatch.fingerprintHint')}</p>
 
       <div className="settings__row">
         <button type="button" className="button" onClick={() => cowatch.approve(knock.id, true)}>
-          Let them in
+          {t('CoWatch.letIn')}
         </button>
         <button
           type="button"
           className="button button--quiet"
           onClick={() => cowatch.approve(knock.id, false)}
         >
-          Turn away
+          {t('CoWatch.turnAway')}
         </button>
       </div>
     </div>
@@ -299,15 +304,15 @@ function GuestRow({
       <span className="cowatch__name">{guest.name}</span>
       <span className="cowatch__addr">
         {!guest.connected
-          ? 'disconnected'
+          ? t('CoWatch.guest.disconnected')
           : !guest.ready
-            ? 'still loading'
+            ? t('CoWatch.guest.loading')
             : guest.latencyMs !== null
               ? `${guest.latencyMs} ms`
-              : 'watching'}
+              : t('CoWatch.guest.watching')}
       </span>
       <button type="button" className="button button--quiet" onClick={onKick}>
-        Remove
+        {t('Card.remove')}
       </button>
     </div>
   )
@@ -344,19 +349,19 @@ export function SessionName(): React.JSX.Element {
 
   return (
     <label className="settings__field">
-      <span className="settings__label">Session username</span>
+      <span className="settings__label">{t('CoWatch.username')}</span>
       <input
         className="settings__input"
         value={draft}
         maxLength={32}
-        placeholder="host"
+        placeholder={t('CoWatch.username.placeholder')}
         onChange={(event) => setDraft(event.target.value)}
         onBlur={commit}
         onKeyDown={(event) => {
           if (event.key === 'Enter') commit()
         }}
       />
-      <span className="settings__hint">The username shown when sharing, defaults to &apos;host&apos;</span>
+      <span className="settings__hint">{t('CoWatch.username.hint')}</span>
     </label>
   )
 }

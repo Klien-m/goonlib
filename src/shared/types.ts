@@ -1,3 +1,4 @@
+import type { Locale } from './i18n'
 import type { KeyBindings } from './keys'
 import type { Theme, ThemeConfig, ThemeMode, ThemeType } from './theme'
 import type { CustomPattern, PatternId, PatternShape, VibrateFrom } from './toy'
@@ -658,12 +659,17 @@ export interface MediaAnnotations {
  */
 export type AiProvider = 'anthropic' | 'openai'
 
+/**
+ * `label` and `note` are catalogue keys rather than words: this list is built
+ * at import, before anything knows which language is showing. The model list
+ * below keeps its own words - they are product names and prices.
+ */
 export const AI_PROVIDERS: Array<{ id: AiProvider; label: string; note: string }> = [
-  { id: 'anthropic', label: 'Claude API', note: 'Anthropic-hosted. Needs an API key.' },
+  { id: 'anthropic', label: 'Ai.provider.claude', note: 'Ai.provider.claude.note' },
   {
     id: 'openai',
-    label: 'Local or OpenAI-compatible',
-    note: 'LM Studio, Ollama, vLLM - anything serving /v1/chat/completions.',
+    label: 'Ai.provider.openai',
+    note: 'Ai.provider.openai.note',
   },
 ]
 
@@ -1010,6 +1016,10 @@ export const IPC = {
   /** Main -> renderer: the session changed, or a reaction flew past. */
   cowatchUpdate: 'cowatch:update',
   cowatchReaction: 'cowatch:reaction',
+  localeGet: 'locale:get',
+  localeSet: 'locale:set',
+  /** Main -> renderer: the language changed, here or in another window. */
+  localeUpdate: 'locale:update',
   themeState: 'theme:state',
   themeSetMode: 'theme:set-mode',
   themeUse: 'theme:use',
@@ -1357,6 +1367,17 @@ export interface GoonLibApi {
      * the question was turned down.
      */
     import(): Promise<boolean>
+  }
+  locale: {
+    /**
+     * The language to write in, read synchronously once by the preload so the
+     * first render is already in it.
+     */
+    initial: Locale
+    current(): Promise<Locale>
+    /** Stores a language and returns it as stored. */
+    set(locale: Locale): Promise<Locale>
+    onUpdate(listener: (locale: Locale) => void): () => void
   }
   theme: {
     /** The themes as they stood when the window opened, for its first paint. */

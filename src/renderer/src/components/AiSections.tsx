@@ -12,6 +12,7 @@ import { CheckIcon, SearchIcon, WarningIcon } from './SidebarIcons'
 import { formatCount } from '../format'
 import { TabPanel } from './TabPanel'
 import type { SheetTab } from './TabPanel'
+import { t } from '../i18n'
 
 export interface AiSectionsProps {
   /** Which tab of the Settings sheet is showing. */
@@ -29,14 +30,14 @@ export interface AiSectionsProps {
  * furthest the hash banding is guaranteed to find.
  */
 const SIMILARITY: Array<{ distance: number; label: string; note: string; icon: React.ReactNode }> = [
-  { distance: 3, label: 'Strict', note: 'Identical matches only', icon: <CheckIcon /> },
+  { distance: 3, label: 'Ai.similarity.strict', note: 'Ai.similarity.strict.note', icon: <CheckIcon /> },
   {
     distance: 6,
-    label: 'Balanced',
-    note: 'Includes lightly cropped, filters and watermarks.',
+    label: 'Ai.similarity.balanced',
+    note: 'Ai.similarity.balanced.note',
     icon: <SearchIcon />,
   },
-  { distance: 7, label: 'Loose', note: 'Loose matches only', icon: <WarningIcon /> },
+  { distance: 7, label: 'Ai.similarity.loose', note: 'Ai.similarity.loose.note', icon: <WarningIcon /> },
 ]
 
 /**
@@ -152,10 +153,25 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
       if (!gone) return
       setReset(
         gone.items === 0
-          ? 'Nothing had been filed by the classifier.'
-          : `Took back ${gone.items} ${gone.items === 1 ? 'entry' : 'entries'}` +
-              `${gone.tags > 0 ? `, ${gone.tags} ${gone.tags === 1 ? 'tag' : 'tags'}` : ''}` +
-              `${gone.collections > 0 ? `, ${gone.collections} ${gone.collections === 1 ? 'collection' : 'collections'}` : ''}.`,
+          ? t('Ai.classify.nothingFiled')
+          : t('Ai.classify.tookBack', {
+              entries:
+                gone.items === 1
+                  ? t('Ai.classify.entries.one')
+                  : t('Ai.classify.entries.many', { count: gone.items }),
+              tags:
+                gone.tags === 0
+                  ? ''
+                  : gone.tags === 1
+                    ? t('Ai.classify.tags.one')
+                    : t('Ai.classify.tags.many', { count: gone.tags }),
+              collections:
+                gone.collections === 0
+                  ? ''
+                  : gone.collections === 1
+                    ? t('Ai.classify.collections.one')
+                    : t('Ai.classify.collections.many', { count: gone.collections }),
+            }),
       )
       props.onChanged()
     } catch (err) {
@@ -192,7 +208,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
   if (settings === null) {
     return (
       <p className="muted" hidden={!AI_TABS.includes(tab)}>
-        {error ?? 'Loading…'}
+        {error ?? t('Ai.loading')}
       </p>
     )
   }
@@ -207,19 +223,15 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
 
             <TabPanel id="providers" tab={tab}>
               <Switch
-                label="Categorise with AI"
-                hint={
-                  settings.provider === 'openai'
-                    ? "Sends each media item's thumbnail to a classifier model during scans and receives back tag(s) for labelling."
-                    : "Sends each item's thumbnail to Claude during a scan and records what comes back as labels. Off by default - it costs money per item."
-                }
+                label={t('Ai.enable')}
+                hint={t(settings.provider === 'openai' ? 'Ai.enable.openai' : 'Ai.enable.anthropic')}
                 checked={settings.enabled}
                 onChange={(enabled) => patch({ enabled })}
               />
 
               {settings.enabled ? (
                 <div className="settings__group">
-                  <Field label="Provider" hint={providerNote(settings.provider)}>
+                  <Field label={t('Ai.provider')} hint={providerNote(settings.provider)}>
                     <select
                       className="settings__select"
                       value={settings.provider}
@@ -231,17 +243,14 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                     >
                       {AI_PROVIDERS.map((provider) => (
                         <option key={provider.id} value={provider.id}>
-                          {provider.label}
+                          {t(provider.label)}
                         </option>
                       ))}
                     </select>
                   </Field>
 
                   {settings.provider === 'openai' ? (
-                    <Field
-                      label="Server address"
-                      hint="Include the /v1 path. LM Studio serves this once you start its local server."
-                    >
+                    <Field label={t('Ai.server')} hint={t('Ai.server.hint')}>
                       <BaseUrlEditor
                         baseUrl={settings.baseUrl}
                         onCommit={(baseUrl) => {
@@ -254,14 +263,18 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                   ) : null}
 
                   <Field
-                    label={settings.provider === 'anthropic' ? 'API key' : 'API key (optional)'}
+                    label={
+                      settings.provider === 'anthropic' ? t('Ai.key') : t('Ai.key.optional')
+                    }
                     hint={keyStatus(settings)}
                   >
                     <div className="settings__row">
                       <input
                         type="password"
                         className="settings__input"
-                        placeholder={settings.apiKeyPresent ? 'Replace the stored key…' : 'sk-ant-…'}
+                        placeholder={
+                          settings.apiKeyPresent ? t('Ai.key.replace') : 'sk-ant-…'
+                        }
                         value={keyDraft}
                         onChange={(event) => setKeyDraft(event.target.value)}
                         onKeyDown={(event) => {
@@ -269,7 +282,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                         }}
                         autoComplete="off"
                         spellCheck={false}
-                        aria-label="Claude API key"
+                        aria-label={t('Ai.key.aria')}
                       />
                       <button
                         type="button"
@@ -277,7 +290,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                         onClick={saveKey}
                         disabled={keyDraft.trim().length === 0}
                       >
-                        Save
+                        {t('Ai.key.save')}
                       </button>
                       {settings.apiKeyPresent ? (
                         <button
@@ -288,7 +301,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                             void guard(() => window.goonlib.ai.clearKey())
                           }}
                         >
-                          Remove
+                          {t('Ai.key.remove')}
                         </button>
                       ) : null}
                     </div>
@@ -300,7 +313,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                         onClick={() => void runTest()}
                         disabled={!settings.ready || testing}
                       >
-                        {testing ? 'Testing…' : 'Test connection'}
+                        {testing ? t('Ai.key.testing') : t('Ai.key.test')}
                       </button>
                       {test ? (
                         <span className={test.ok ? 'settings__ok' : 'settings__bad'}>
@@ -311,7 +324,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                   </Field>
 
                   {settings.provider === 'anthropic' ? (
-                    <Field label="Model" hint="Cheaper models label faster and cost less per item.">
+                    <Field label={t('Ai.model')} hint={t('Ai.model.hint')}>
                       <select
                         className="settings__select"
                         value={settings.model}
@@ -328,10 +341,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                       </select>
                     </Field>
                   ) : (
-                    <Field
-                      label="Model"
-                      hint="Requires a matching model_id for a vision-capable model"
-                    >
+                    <Field label={t('Ai.model')} hint={t('Ai.model.local.hint')}>
                       {available === null ? (
                         <div className="settings__row">
                           <ModelEditor
@@ -344,7 +354,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                             onClick={() => void loadModels()}
                             disabled={loadingModels}
                           >
-                            {loadingModels ? 'Loading…' : 'Load'}
+                            {loadingModels ? t('Ai.model.loading') : t('Ai.model.load')}
                           </button>
                         </div>
                       ) : available.length === 0 ? (
@@ -353,7 +363,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                             model={settings.model}
                             onCommit={(model) => patch({ model })}
                           />
-                          <span className="settings__bad">None loaded</span>
+                          <span className="settings__bad">{t('Ai.model.none')}</span>
                         </div>
                       ) : (
                         <select
@@ -365,7 +375,9 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                               has since unloaded it, so opening settings can't
                               silently rewrite the model out from under a scan. */}
                           {available.includes(settings.model) ? null : (
-                            <option value={settings.model}>{settings.model} (not loaded)</option>
+                            <option value={settings.model}>
+                              {t('Ai.model.notLoaded', { id: settings.model })}
+                            </option>
                           )}
                           {available.map((id) => (
                             <option key={id} value={id}>
@@ -378,12 +390,12 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                   )}
 
                   <Field
-                    label="Requests at once"
-                    hint={
+                    label={t('Ai.concurrency')}
+                    hint={t(
                       settings.provider === 'openai'
-                        ? 'Most local servers process one request at a time, so going much above 1 mainly queues them up. Raise it only if yours batches.'
-                        : 'Higher finishes a backlog sooner but is likelier to hit your rate limit.'
-                    }
+                        ? 'Ai.concurrency.hint.openai'
+                        : 'Ai.concurrency.hint.anthropic',
+                    )}
                   >
                     <input
                       type="number"
@@ -401,10 +413,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
             <TabPanel id="tagging" tab={tab}>
               {settings.enabled ? null : <OffNote onOpen={() => choose('providers')} />}
 
-              <Field
-                label="Labels"
-                hint="One per line. Leave this empty and the model invents its own labels."
-              >
+              <Field label={t('Ai.labels')} hint={t('Ai.labels.hint')}>
                 <CategoryEditor
                   categories={settings.categories}
                   onCommit={(categories) => patch({ categories })}
@@ -416,60 +425,56 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                     onClick={() =>
                       patch({ categories: [...settings.categories, ...ADULT_CATEGORIES] })
                     }
-                    title={`Adds the top ${ADULT_CATEGORIES.length} adult categories to what is already here; nothing you typed is lost`}
+                    title={t('Ai.prefill.title', { count: ADULT_CATEGORIES.length })}
                   >
-                    Pre-fill
+                    {t('Ai.prefill')}
                   </button>
-                  <span className="muted">{settings.categories.length} in use</span>
+                  <span className="muted">{t('Ai.inUse', { count: settings.categories.length })}</span>
                 </div>
               </Field>
 
               <div className="settings__group settings__field">
-                <span className="settings__label">Classification</span>
+                <span className="settings__label">{t('Ai.classification')}</span>
                 <div className="settings__row settings__row--tight">
                   <button
                     type="button"
                     className="button"
                     onClick={() => void reclassify(false)}
                     disabled={!settings.ready}
-                    title="Queue everything that has never been labelled"
+                    title={t('Ai.classify.unlabelled.title')}
                   >
-                    Classify unlabelled
+                    {t('Ai.classify.unlabelled')}
                   </button>
                   <button
                     type="button"
                     className="button button--quiet"
                     onClick={() => void reclassify(true)}
                     disabled={!settings.ready}
-                    title="Re-run everything, including items that already have labels"
+                    title={t('Ai.classify.all.title')}
                   >
-                    Re-classify all
+                    {t('Ai.classify.all')}
                   </button>
                   <button
                     type="button"
                     className="button button--danger"
                     onClick={() => void resetAi()}
-                    title="Take back every tag and collection the classifier filed"
+                    title={t('Ai.classify.reset.title')}
                   >
-                    Reset
+                    {t('Ai.classify.reset')}
                   </button>
                   {queued !== null ? (
                     <span className="muted">
-                      {queued === 0 ? 'Nothing to queue' : `${queued} queued`}
+                      {queued === 0 ? t('Ai.classify.nothing') : t('Ai.classify.queued', { count: queued })}
                     </span>
                   ) : null}
                   {reset !== null ? <span className="muted">{reset}</span> : null}
                 </div>
-                <span className="settings__hint">
-                  New items are classified as they are scanned. These are for everything already
-                  in the library - after changing the categories, say, Re-classify all labels it
-                  again against the new list.
-                </span>
+                <span className="settings__hint">{t('Ai.classify.hint')}</span>
 
                 {settings.autoSort ? (
                   <Slider
-                    label="Confidence threshold"
-                    hint="Labels below this are still recorded, but won't file anything."
+                    label={t('Ai.confidence')}
+                    hint={t('Ai.confidence.hint')}
                     min={0}
                     max={100}
                     step={5}
@@ -483,24 +488,24 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
               <div className="settings__group">
                 <Switch
                   compact
-                  label="Sort into collections automatically"
-                  hint="Adds each item to a collection named after its labels. Collections are just views - nothing on disk is moved or renamed."
+                  label={t('Ai.autoSort')}
+                  hint={t('Ai.autoSort.hint')}
                   checked={settings.autoSort}
                   onChange={(autoSort) => patch({ autoSort })}
                 />
 
                 <Switch
                   compact
-                  label="Write a description of each item"
-                  hint="Asked for in the same request as the labels, so it costs tokens but not an extra call. Descriptions are added to the search index - you can then find things by what is in them, not just by filename."
+                  label={t('Ai.captions')}
+                  hint={t('Ai.captions.hint')}
                   checked={settings.captions}
                   onChange={(captions) => patch({ captions })}
                 />
 
                 <Switch
                   compact
-                  label="Include videos"
-                  hint="Videos are judged from their poster frame alone, so the labels are weaker than for images."
+                  label={t('Ai.videos')}
+                  hint={t('Ai.videos.hint')}
                   checked={settings.includeVideos}
                   onChange={(includeVideos) => patch({ includeVideos })}
                 />
@@ -511,16 +516,18 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
             <TabPanel id="duplicates" tab={tab}>
               <div className="settings__field">
                 <button type="button" className="button" onClick={props.onOpenDuplicates}>
-                  Open duplicates
+                  {t('Ai.openDuplicates')}
                 </button>
                 <span className="settings__hint">
-                  Detected duplicate files{dupeCount === null ? '' : ` (${formatCount(dupeCount)})`}
+                  {dupeCount === null
+                    ? t('Ai.duplicates.detected')
+                    : t('Ai.duplicates.detected.count', { count: formatCount(dupeCount) })}
                 </span>
               </div>
 
               <div className="settings__group">
-                <Field label="Likeness threshold">
-                  <div className="cowatch__providers" role="radiogroup" aria-label="Similarity">
+                <Field label={t('Ai.similarity')}>
+                  <div className="cowatch__providers" role="radiogroup" aria-label={t('Ai.similarity.aria')}>
                     {SIMILARITY.map((option) => (
                       <button
                         key={option.distance}
@@ -533,9 +540,9 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                             : 'cowatch__provider'
                         }
                         onClick={() => changeDistance(option.distance)}
-                        title={option.note}
+                        title={t(option.note)}
                       >
-                        {option.label}
+                        {t(option.label)}
                       </button>
                     ))}
                   </div>
@@ -544,7 +551,7 @@ export function AiSections(props: AiSectionsProps): React.JSX.Element {
                     return (
                       <span className="settings__hint settings__hint--icon">
                         {chosen ? chosen.icon : null}
-                        {chosen ? chosen.note : 'A custom setting.'}
+                        {chosen ? t(chosen.note) : t('Ai.similarity.custom')}
                       </span>
                     )
                   })()}
@@ -562,9 +569,9 @@ const AI_TABS: SheetTab[] = ['providers', 'tagging', 'duplicates']
 function OffNote({ onOpen }: { onOpen: () => void }): React.JSX.Element {
   return (
     <p className="settings__hint settings__note">
-      AI is switched off, so none of this runs yet.{' '}
+      {t('Ai.off')}{' '}
       <button type="button" className="linkish" onClick={onOpen}>
-        Turn it on under Providers
+        {t('Ai.off.turnOn')}
       </button>
       .
     </p>
@@ -572,19 +579,16 @@ function OffNote({ onOpen }: { onOpen: () => void }): React.JSX.Element {
 }
 
 function providerNote(provider: AiProvider): string {
-  return AI_PROVIDERS.find((entry) => entry.id === provider)?.note ?? ''
+  const note = AI_PROVIDERS.find((entry) => entry.id === provider)?.note ?? ''
+  return note ? t(note) : ''
 }
 
 function keyStatus(settings: AiSettingsView): string {
   if (!settings.apiKeyPresent) {
-    return settings.provider === 'openai'
-      ? 'Local servers ignore this. Set it only if your endpoint requires a bearer token.'
-      : 'Stored on this machine only, never sent to the window.'
+    return t(settings.provider === 'openai' ? 'Ai.key.notSet.openai' : 'Ai.key.notSet.anthropic')
   }
 
-  return settings.apiKeyEncrypted
-    ? 'Stored, encrypted with the system keychain.'
-    : 'Stored as plain text - this system has no keychain available.'
+  return t(settings.apiKeyEncrypted ? 'Ai.key.storedEncrypted' : 'Ai.key.storedPlain')
 }
 
 /** Committed on blur, so a half-typed URL is never saved and then requested. */
@@ -612,7 +616,7 @@ function BaseUrlEditor(props: {
       onKeyDown={(event) => {
         if (event.key === 'Enter') event.currentTarget.blur()
       }}
-      aria-label="Server address"
+      aria-label={t('Ai.server.aria')}
     />
   )
 }
@@ -640,7 +644,7 @@ function ModelEditor(props: {
       onKeyDown={(event) => {
         if (event.key === 'Enter') event.currentTarget.blur()
       }}
-      aria-label="Model id"
+      aria-label={t('Ai.model.local.aria')}
     />
   )
 }
@@ -681,11 +685,11 @@ function CategoryEditor(props: {
       className="settings__textarea"
       rows={5}
       value={draft}
-      placeholder={'portraits\nlandscape\nblack and white'}
+      placeholder={t('Ai.labels.placeholder')}
       spellCheck={false}
       onChange={(event) => setDraft(event.target.value)}
       onBlur={() => props.onCommit(draft.split('\n'))}
-      aria-label="Categories, one per line"
+      aria-label={t('Ai.labels.aria')}
     />
   )
 }

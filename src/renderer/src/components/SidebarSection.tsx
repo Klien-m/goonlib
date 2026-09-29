@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { formatCount } from '../format'
+import { t } from '../i18n'
 
 /** Which entries a section lists: everything, only yours, or only the classifier's. */
 export type SectionFilter = 'all' | 'mine' | 'ai'
 
 const FILTERS: Array<{ id: SectionFilter; label: string }> = [
-  { id: 'all', label: 'All' },
-  { id: 'mine', label: 'Yours' },
-  { id: 'ai', label: 'AI' },
+  { id: 'all', label: 'Section.filter.all' },
+  { id: 'mine', label: 'Section.filter.mine' },
+  { id: 'ai', label: 'Section.filter.ai' },
 ]
 
 export interface SidebarSectionProps {
@@ -75,12 +76,14 @@ export function SidebarSection(props: SidebarSectionProps): React.JSX.Element {
           }}
           aria-expanded={!collapsed}
           aria-haspopup={filter ? 'menu' : undefined}
-          title={filter ? `${props.title} - right-click to show all, yours, or the AI's` : undefined}
+          title={filter ? t('Section.filter.title', { title: props.title }) : undefined}
         >
           {props.icon ? <span className="sidebar__icon">{props.icon}</span> : null}
           <span className="sidebar__title">{props.title}</span>
           {filter && filter.value !== 'all' ? (
-            <span className="sidebar__filter">{filter.value === 'ai' ? 'ai' : 'yours'}</span>
+            <span className="sidebar__filter">
+              {filter.value === 'ai' ? t('Section.filter.aiShort') : t('Section.filter.mineShort')}
+            </span>
           ) : null}
           {props.count !== undefined && (collapsed || props.count > 0) ? (
             <span className="sidebar__tally">{formatCount(props.count)}</span>
@@ -88,7 +91,11 @@ export function SidebarSection(props: SidebarSectionProps): React.JSX.Element {
         </button>
 
         {filter && menu ? (
-          <div className="addto__menu addto__menu--narrow" role="menu" aria-label={`${props.title} to show`}>
+          <div
+            className="addto__menu addto__menu--narrow"
+            role="menu"
+            aria-label={t('Section.filter.menu', { title: props.title })}
+          >
             {FILTERS.map((option) => (
               <button
                 key={option.id}
@@ -104,7 +111,7 @@ export function SidebarSection(props: SidebarSectionProps): React.JSX.Element {
                 <span className="addto__check" aria-hidden="true">
                   {filter.value === option.id ? '✓' : ''}
                 </span>
-                <span className="addto__name">{option.label}</span>
+                <span className="addto__name">{t(option.label)}</span>
               </button>
             ))}
           </div>

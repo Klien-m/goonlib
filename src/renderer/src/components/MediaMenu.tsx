@@ -3,6 +3,7 @@ import type { Collection, MediaFileAction, MediaItem, Root, Tag } from '@shared/
 import { IS_MAC, REVEAL_LABEL, TRASH_NAME } from '../platform'
 import { FolderPicker } from './FolderPicker'
 import { AddToCollection } from './AddToCollection'
+import { t } from '../i18n'
 
 /** Where a menu was asked for, in window coordinates. */
 export interface MenuAt {
@@ -118,7 +119,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
     const stem = stemOf(item)
 
     return (
-      <div className="mediamenu" style={place} ref={shellRef} role="dialog" aria-label={`Rename ${item.name}`}>
+      <div className="mediamenu" style={place} ref={shellRef} role="dialog" aria-label={t('Menu.rename.title', { name: item.name })}>
         <form
           className="mediamenu__form"
           onSubmit={(event) => {
@@ -138,28 +139,28 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
               .finally(() => setBusy(false))
           }}
         >
-          <span className="mediamenu__head">Rename</span>
+          <span className="mediamenu__head">{t('Menu.rename')}</span>
           <input
             className="collection__input"
             value={renaming}
             autoFocus
-            placeholder="Name"
+            placeholder={t('Menu.name')}
             onChange={(event) => setRenaming(event.target.value)}
             onFocus={(event) => event.currentTarget.select()}
           />
           {/* The extension is not in the box and not up for editing: it is what
               says what the file is, and this menu is for fixing a bad name. */}
-          <span className="settings__hint">Keeps {item.ext || 'its extension'}</span>
+          <span className="settings__hint">{t('Menu.rename.keeps', { ext: item.ext || t('Menu.rename.itsExt') })}</span>
           <div className="settings__row settings__row--tight">
             <button
               type="submit"
               className="button button--primary"
               disabled={busy || !renaming.trim() || renaming === stem}
             >
-              Rename
+              {t('Menu.rename')}
             </button>
             <button type="button" className="button button--quiet" onClick={onClose}>
-              Cancel
+              {t('Folder.cancel')}
             </button>
           </div>
         </form>
@@ -169,8 +170,8 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
 
   if (picking) {
     return (
-      <div className="mediamenu" style={place} ref={shellRef} role="menu" aria-label={`Move ${item.name}`}>
-        <span className="mediamenu__head">Move {item.name} to</span>
+      <div className="mediamenu" style={place} ref={shellRef} role="menu" aria-label={t('Menu.move.title', { name: item.name })}>
+        <span className="mediamenu__head">{t('Menu.move.head', { name: item.name })}</span>
         <div className="mediamenu__rule" role="separator" />
         <FolderPicker
           roots={props.roots}
@@ -201,7 +202,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
           props.onOpen(item.id)
         }}
       >
-        {item.kind === 'video' ? 'Play' : 'Open'}
+        {item.kind === 'video' ? t('Menu.play') : t('Menu.open')}
       </button>
 
       <button
@@ -214,14 +215,14 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
           props.onFavorite(item.id, item.favoritedAt === null)
         }}
       >
-        {item.favoritedAt !== null ? 'Unfavorite' : 'Favorite'}
+        {item.favoritedAt !== null ? t('Menu.unfavorite') : t('Menu.favorite')}
       </button>
 
       <div className="mediamenu__rule" role="separator" />
 
       <div className="mediamenu__row">
         <AddToCollection
-          label="Add to Collection"
+          label={t('Selection.addCollection')}
           collections={props.collections}
           activeIds={memberOf}
           onAdd={(target) =>
@@ -230,9 +231,9 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
           onRemove={(id) => void Promise.resolve(props.onLeaveCollection(id, item.id)).then(loadMembership)}
         />
         <AddToCollection
-          label="Add to Tag"
-          placeholder="Search or add a tag"
-          emptyText="No tags yet."
+          label={t('Selection.addTag')}
+          placeholder={t('Selection.searchTag')}
+          emptyText={t('Selection.noTags')}
           collections={props.tags}
           activeIds={tagIds}
           onAdd={(target) =>
@@ -254,7 +255,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
             void Promise.resolve(props.onLeaveCollection(props.activeCollection!.id, item.id))
           }}
         >
-          Remove from “{props.activeCollection.name}”
+          {t('Menu.leaveCollection', { name: props.activeCollection.name })}
         </button>
       ) : null}
 
@@ -265,19 +266,19 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
           both would be two names for one thing. */}
       {IS_MAC ? (
         <button type="button" className="mediamenu__item" role="menuitem" onClick={() => act('copy')}>
-          Copy
+          {t('Menu.copy')}
         </button>
       ) : null}
       {item.kind === 'image' ? (
         <button type="button" className="mediamenu__item" role="menuitem" onClick={() => act('copy-image')}>
-          Copy Image
+          {t('Menu.copyImage')}
         </button>
       ) : null}
       <button type="button" className="mediamenu__item" role="menuitem" onClick={() => act('copy-path')}>
-        Copy File Path
+        {t('Menu.copyPath')}
       </button>
       <button type="button" className="mediamenu__item" role="menuitem" onClick={() => act('copy-name')}>
-        Copy Filename
+        {t('Menu.copyName')}
       </button>
 
       <div className="mediamenu__rule" role="separator" />
@@ -288,11 +289,11 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
         role="menuitem"
         onClick={() => setRenaming(stemOf(item))}
       >
-        Rename…
+        {t('Menu.renameEllipsis')}
       </button>
 
       <button type="button" className="mediamenu__item" role="menuitem" onClick={() => setPicking(true)}>
-        Move to folder…
+        {t('Menu.moveTo')}
       </button>
 
       <button type="button" className="mediamenu__item" role="menuitem" onClick={() => act('reveal')}>
@@ -307,7 +308,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
         role="menuitem"
         onClick={() => act('trash')}
       >
-        Move to {TRASH_NAME}
+        {t('Menu.trash', { trash: TRASH_NAME })}
       </button>
     </div>
   )

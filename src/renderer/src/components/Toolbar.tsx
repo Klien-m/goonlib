@@ -7,6 +7,7 @@ import { DownloadIcon, ImageIcon, LibraryIcon, SearchIcon, SortIcon, StorageIcon
 import type { ToyView } from '../state/useToy'
 import { StorageCard } from './StorageCard'
 import { ToyChip } from './ToyChip'
+import { t } from '../i18n'
 
 export interface ToolbarProps {
   search: string
@@ -102,21 +103,21 @@ export function HeartIcon({ filled = false, size = 15 }: { filled?: boolean; siz
 
 /** The media-type segments, each with the glyph that stands for it. */
 const KINDS: Array<{ value: MediaKind | 'all'; label: string; icon: React.JSX.Element }> = [
-  { value: 'all', label: 'All', icon: <LibraryIcon /> },
-  { value: 'image', label: 'Images', icon: <ImageIcon /> },
-  { value: 'video', label: 'Videos', icon: <VideoIcon /> },
+  { value: 'all', label: 'Toolbar.kind.all', icon: <LibraryIcon /> },
+  { value: 'image', label: 'Toolbar.kind.image', icon: <ImageIcon /> },
+  { value: 'video', label: 'Toolbar.kind.video', icon: <VideoIcon /> },
 ]
 
 const SORT_LABELS: Array<{ value: MediaSort; label: string }> = [
-  { value: 'added', label: 'Recently added' },
-  { value: 'name', label: 'Name' },
-  { value: 'size', label: 'Size' },
-  { value: 'duration', label: 'Duration' },
-  { value: 'shuffle', label: 'Shuffle' },
+  { value: 'added', label: 'Toolbar.sort.added' },
+  { value: 'name', label: 'Toolbar.sort.name' },
+  { value: 'size', label: 'Toolbar.sort.size' },
+  { value: 'duration', label: 'Toolbar.sort.duration' },
+  { value: 'shuffle', label: 'Toolbar.sort.shuffle' },
 ]
 
 /** Only offered inside a collection, which is the only place an order is stored. */
-const MANUAL_SORT = { value: 'manual' as const, label: 'Custom order' }
+const MANUAL_SORT = { value: 'manual' as const, label: 'Toolbar.sort.manual' }
 
 export function Toolbar(props: ToolbarProps): React.JSX.Element {
   const scrapeMode = looksLikeUrl(props.search)
@@ -137,7 +138,7 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
           className={scrapeMode ? 'toolbar__search toolbar__search--url' : 'toolbar__search'}
           // Just "Search": pasting a link works, but it is a back pocket
           // feature, not one worth spending the box's only line of text on.
-          placeholder="Search"
+          placeholder={t('Toolbar.search.placeholder')}
           value={props.search}
           onChange={(event) => props.onSearchChange(event.target.value)}
           onKeyDown={(event) => {
@@ -145,7 +146,7 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
               props.onScrape(props.search.trim())
             }
           }}
-          aria-label="Search the library, or paste a 4chan thread link to download it"
+          aria-label={t('Toolbar.search.aria')}
         />
       </div>
 
@@ -155,13 +156,13 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
           className="button"
           onClick={() => props.onScrape(props.search.trim())}
           disabled={props.scraping}
-          title="Download this thread's images and videos into Downloads, and add the folder to the library"
+          title={t('Toolbar.download.title')}
         >
-          {props.scraping ? 'Downloading…' : 'Download thread'}
+          {props.scraping ? t('Toolbar.downloading') : t('Toolbar.download')}
         </button>
       ) : null}
 
-      <div className="segmented" role="group" aria-label="Filter by media type">
+      <div className="segmented" role="group" aria-label={t('Toolbar.kinds.aria')}>
         {KINDS.map((entry) => (
           <button
             key={entry.value}
@@ -171,7 +172,7 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
             aria-pressed={props.kind === entry.value}
           >
             {entry.icon}
-            {entry.label}
+            {t(entry.label)}
           </button>
         ))}
       </div>
@@ -190,7 +191,7 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
           the way in to the breakdown, since it is already the thing standing
           between the two numbers it would explain. */}
       <span className="toolbar__count">
-        {formatCount(props.total)} items
+        {t('Toolbar.count.items', { count: formatCount(props.total) })}
         <button
           type="button"
           className={breakdown ? 'toolbar__breakdown is-open' : 'toolbar__breakdown'}
@@ -200,10 +201,10 @@ export function Toolbar(props: ToolbarProps): React.JSX.Element {
           }}
           aria-expanded={breakdown !== null}
           aria-haspopup="dialog"
-          title="What this is made of"
+          title={t('Toolbar.breakdown.title')}
         >
           <StorageIcon />
-          <span className="visually-hidden">What this is made of</span>
+          <span className="visually-hidden">{t('Toolbar.breakdown.aria')}</span>
         </button>
         {formatBytes(props.totalBytes)}
       </span>
@@ -239,17 +240,17 @@ function SortMenu(props: {
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={`Sort by ${current?.label ?? ''}`}
+        aria-label={t('Toolbar.sort.aria', { label: current ? t(current.label) : '' })}
       >
         <SortIcon />
-        {current?.label}
+        {current ? t(current.label) : ''}
         <span className="toolbar__sort-chevron" aria-hidden="true">
           ▾
         </span>
       </button>
 
       {open ? (
-        <div className="addto__menu addto__menu--narrow" role="menu" aria-label="Sort by">
+        <div className="addto__menu addto__menu--narrow" role="menu" aria-label={t('Toolbar.sort.menu')}>
           {props.options.map((option) => (
             <button
               key={option.value}
@@ -265,7 +266,7 @@ function SortMenu(props: {
               <span className="addto__check" aria-hidden="true">
                 {option.value === props.sort ? '✓' : ''}
               </span>
-              <span className="addto__name">{option.label}</span>
+              <span className="addto__name">{t(option.label)}</span>
             </button>
           ))}
         </div>
@@ -299,16 +300,16 @@ function useDismiss(open: boolean, shellRef: React.RefObject<HTMLDivElement | nu
 }
 
 const RANDOM_KINDS: Array<{ id: MediaKind | 'all'; label: string }> = [
-  { id: 'video', label: 'Videos' },
-  { id: 'image', label: 'Images' },
-  { id: 'all', label: 'Both' },
+  { id: 'video', label: 'Toolbar.shuffle.video' },
+  { id: 'image', label: 'Toolbar.shuffle.image' },
+  { id: 'all', label: 'Toolbar.shuffle.all' },
 ]
 
 /** What a random pick is, in a sentence: "a random video". */
 const KIND_NOUN: Record<MediaKind | 'all', string> = {
-  video: 'video',
-  image: 'image',
-  all: 'item',
+  video: 'Toolbar.noun.video',
+  image: 'Toolbar.noun.image',
+  all: 'Toolbar.noun.all',
 }
 
 /**
@@ -332,10 +333,9 @@ export function ShuffleToggle(props: {
   const closeMenu = useCallback(() => setOpen(false), [])
   useDismiss(open, shellRef, closeMenu)
 
-  const noun = KIND_NOUN[props.kind]
   const state = props.shuffle
-    ? `Shuffle is on - next plays a random ${noun}`
-    : 'Shuffle off - next plays the following item'
+    ? t('Toolbar.shuffle.on', { noun: t(KIND_NOUN[props.kind]) })
+    : t('Toolbar.shuffle.off')
 
   return (
     <div className="addto" ref={shellRef}>
@@ -350,14 +350,17 @@ export function ShuffleToggle(props: {
         aria-pressed={props.shuffle}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={`${state}${props.shortcut ? ` (${props.shortcut})` : ''} · right-click to choose videos, images or both`}
+        title={t('Toolbar.shuffle.title', {
+          state,
+          shortcut: props.shortcut ? t('Toolbar.shuffle.shortcut', { keys: props.shortcut }) : '',
+        })}
       >
         <ShuffleIcon />
-        <span className="visually-hidden">Shuffle</span>
+        <span className="visually-hidden">{t('Toolbar.shuffle.label')}</span>
       </button>
 
       {open ? (
-        <div className="addto__menu addto__menu--narrow" role="menu" aria-label="Shuffle picks from">
+        <div className="addto__menu addto__menu--narrow" role="menu" aria-label={t('Toolbar.shuffle.menu')}>
           {RANDOM_KINDS.map((option) => (
             <button
               key={option.id}
@@ -374,7 +377,7 @@ export function ShuffleToggle(props: {
               <span className="addto__check" aria-hidden="true">
                 {option.id === props.kind ? '✓' : ''}
               </span>
-              <span className="addto__name">{option.label}</span>
+              <span className="addto__name">{t(option.label)}</span>
             </button>
           ))}
         </div>

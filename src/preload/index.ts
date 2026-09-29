@@ -8,6 +8,7 @@
  */
 
 import { contextBridge, ipcRenderer } from 'electron'
+import type { Locale } from '@shared/i18n'
 import type { KeyBindings } from '@shared/keys'
 import type { Theme, ThemeMode, ThemeType } from '@shared/theme'
 import type { CustomPattern } from '@shared/toy'
@@ -273,6 +274,18 @@ const api: GoonLibApi = {
   settings: {
     export: (): Promise<boolean> => ipcRenderer.invoke(IPC.settingsExport),
     import: (): Promise<boolean> => ipcRenderer.invoke(IPC.settingsImport),
+  },
+  locale: {
+    // Asked for synchronously, once, so the first render is already in the
+    // right language. Everything after that arrives through onUpdate.
+    initial: ipcRenderer.sendSync(IPC.localeGet) as Locale,
+    current: (): Promise<Locale> => ipcRenderer.invoke(IPC.localeGet),
+    set: (locale: Locale): Promise<Locale> => ipcRenderer.invoke(IPC.localeSet, locale),
+    onUpdate: (listener: (locale: Locale) => void): (() => void) => {
+      const wrapped = (_event: unknown, locale: Locale): void => listener(locale)
+      ipcRenderer.on(IPC.localeUpdate, wrapped)
+      return () => ipcRenderer.removeListener(IPC.localeUpdate, wrapped)
+    },
   },
   theme: {
     // Asked for synchronously, once, so the first paint is already in the

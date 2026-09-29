@@ -12,16 +12,17 @@ import {
 } from '@shared/theme'
 import { acceptThemeState, setPreview, useThemeState } from '../theme'
 import { HeartIcon } from './Toolbar'
+import { t } from '../i18n'
 
 const MODES: Array<{ id: ThemeMode; label: string }> = [
-  { id: 'dark', label: 'Dark' },
-  { id: 'light', label: 'Light' },
-  { id: 'system', label: 'Auto' },
+  { id: 'dark', label: 'Appearance.mode.dark' },
+  { id: 'light', label: 'Appearance.mode.light' },
+  { id: 'system', label: 'Appearance.mode.system' },
 ]
 
 const SIDES: Array<{ id: ThemeType; label: string }> = [
-  { id: 'dark', label: 'Dark theme' },
-  { id: 'light', label: 'Light theme' },
+  { id: 'dark', label: 'Appearance.side.dark' },
+  { id: 'light', label: 'Appearance.side.light' },
 ]
 
 /** Two themes are the same when every colour they set is. */
@@ -120,8 +121,12 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
   return (
     <div className="styling">
       <div className="settings__field">
-        <span className="settings__label">Mode</span>
-        <div className="cowatch__providers" role="radiogroup" aria-label="Mode">
+        <span className="settings__label">{t('Appearance.mode.label')}</span>
+        <div
+          className="cowatch__providers"
+          role="radiogroup"
+          aria-label={t('Appearance.mode.label')}
+        >
           {MODES.map((mode) => (
             <button
               key={mode.id}
@@ -131,15 +136,17 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
               className={config.mode === mode.id ? 'cowatch__provider cowatch__provider--on' : 'cowatch__provider'}
               onClick={() => void run(async () => acceptThemeState(await window.goonlib.theme.setMode(mode.id)))}
             >
-              {mode.label}
+              {t(mode.label)}
             </button>
           ))}
         </div>
         <span className="settings__hint">
           {config.mode === 'system'
-            ? 'Switches between your dark and light themes with the system.'
-            : `Always your ${config.mode} theme.`}{' '}
-          Guests watching together see the same.
+            ? t('Appearance.mode.hint')
+            : t('Appearance.mode.always', {
+                mode: t(config.mode === 'light' ? 'Appearance.side.light' : 'Appearance.side.dark'),
+              })}{' '}
+          {t('Appearance.mode.guests')}
         </span>
       </div>
 
@@ -150,11 +157,11 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
           const current = entries.find((entry) => sameTheme(entry.theme, theme))
           return (
             <div key={slot.id} className="styling__slot">
-              <span className="settings__label">{slot.label}</span>
+              <span className="settings__label">{t(slot.label)}</span>
               <Swatches theme={theme} />
               <select
                 className="settings__select"
-                aria-label={slot.label}
+                aria-label={t(slot.label)}
                 value={current?.id ?? ''}
                 onChange={(event) => {
                   const entry = library.find((e) => e.id === event.target.value)
@@ -165,11 +172,13 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
                   })
                 }}
               >
-                {current ? null : <option value="">{theme.name} (edited)</option>}
+                {current ? null : (
+                  <option value="">{t('Appearance.theme.edited', { name: theme.name })}</option>
+                )}
                 {entries.map((entry) => (
                   <option key={entry.id} value={entry.id}>
                     {entry.theme.name}
-                    {entry.builtIn ? '' : ' · yours'}
+                    {entry.builtIn ? '' : ` · ${t('Appearance.theme.yours')}`}
                   </option>
                 ))}
               </select>
@@ -180,8 +189,12 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
 
       <div className="settings__group">
         <div className="styling__edithead">
-          <span className="settings__label">Edit</span>
-          <div className="tabbar styling__sides" role="tablist" aria-label="Theme to edit">
+          <span className="settings__label">{t('Appearance.edit')}</span>
+          <div
+            className="tabbar styling__sides"
+            role="tablist"
+            aria-label={t('Appearance.edit.label')}
+          >
             {SIDES.map((slot) => (
               <button
                 key={slot.id}
@@ -191,7 +204,7 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
                 className={side === slot.id ? 'tabbar__tab tabbar__tab--on' : 'tabbar__tab'}
                 onClick={() => chooseSide(slot.id)}
               >
-                {slot.label}
+                {t(slot.label)}
               </button>
             ))}
           </div>
@@ -199,17 +212,17 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
 
         <div className="styling__row">
           <label className="settings__field styling__grow">
-            <span className="settings__label">Name</span>
+            <span className="settings__label">{t('Appearance.name.label')}</span>
             <input
               className="settings__input"
               value={draft.name}
               maxLength={60}
               onChange={(event) => edit({ ...draft, name: event.target.value })}
-              placeholder="My theme"
+              placeholder={t('Appearance.edit.myTheme')}
             />
           </label>
           <label className="settings__field">
-            <span className="settings__label">Start from</span>
+            <span className="settings__label">{t('Appearance.startFrom')}</span>
             <select
               className="settings__select"
               value=""
@@ -224,10 +237,13 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
               }}
             >
               <option value="" disabled>
-                Choose a theme…
+                {t('Appearance.choose')}
               </option>
               {(['dark', 'light'] as const).map((type) => (
-                <optgroup key={type} label={type === 'dark' ? 'Dark' : 'Light'}>
+                <optgroup
+                  key={type}
+                  label={t(type === 'dark' ? 'Appearance.mode.dark' : 'Appearance.mode.light')}
+                >
                   {ofSide(type).map((entry) => (
                     <option key={entry.id} value={entry.id}>
                       {entry.theme.name}
@@ -256,11 +272,14 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
           <span className={fineTune ? 'styling__chevron styling__chevron--open' : 'styling__chevron'} aria-hidden="true">
             ›
           </span>
-          Fine-tune
+          {t('Appearance.fineTune')}
           <span className="settings__hint">
-            {Object.keys(draft.colors).filter((k) => !['background', 'foreground', 'accent'].includes(k)).length} of{' '}
-            {THEME_KEYS.length - 3}
-            set - the rest follow the base colours
+            {t('Appearance.fineTune.count', {
+              set: Object.keys(draft.colors).filter(
+                (k) => !['background', 'foreground', 'accent'].includes(k),
+              ).length,
+              total: THEME_KEYS.length - 3,
+            })}
           </span>
         </button>
 
@@ -285,9 +304,9 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
                 setApplied(true)
               }
             }}
-            title="Show this across the whole app, without keeping it"
+            title={t('Appearance.apply.title')}
           >
-            {applied ? 'Applied - click to undo' : 'Apply'}
+            {applied ? t('Appearance.applied') : t('Appearance.apply')}
           </button>
           <button
             type="button"
@@ -300,16 +319,24 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
                 setApplied(false)
                 setPreview(null)
                 acceptThemeState(next)
-                setMessage({ ok: true, text: `Saved “${draft.name.trim()}” as your ${side} theme.` })
+                setMessage({
+                  ok: true,
+                  text: t('Appearance.saved', {
+                    name: draft.name.trim(),
+                    side: t(side === 'light' ? 'Appearance.side.light' : 'Appearance.side.dark'),
+                  }),
+                })
               })
             }
-            title={`Keep it in your themes, and use it as the ${side} theme`}
+            title={t('Appearance.save.title', {
+              side: t(side === 'light' ? 'Appearance.side.light' : 'Appearance.side.dark'),
+            })}
           >
-            Save
+            {t('Appearance.save')}
           </button>
           {dirty ? (
             <button type="button" className="button button--quiet" onClick={discard}>
-              Discard changes
+              {t('Appearance.discard')}
             </button>
           ) : null}
 
@@ -320,12 +347,15 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
               onClick={() =>
                 void run(async () => {
                   acceptThemeState(await window.goonlib.theme.remove(savedEntry.id))
-                  setMessage({ ok: true, text: `Moved “${savedEntry.theme.name}” to the Trash.` })
+                  setMessage({
+                    ok: true,
+                    text: t('Appearance.removed', { name: savedEntry.theme.name }),
+                  })
                 })
               }
-              title="Move this theme's file to the Trash. If it is in use, it stays in use until you pick another."
+              title={t('Appearance.remove.title')}
             >
-              Delete
+              {t('Appearance.remove')}
             </button>
           ) : null}
 
@@ -344,13 +374,16 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
                   ok: result.skipped.length === 0,
                   text:
                     result.skipped.length === 0
-                      ? `Imported “${result.theme.name}”. Save to use it.`
-                      : `Imported “${result.theme.name}”, skipping ${result.skipped.join(', ')}.`,
+                      ? t('Appearance.imported', { name: result.theme.name })
+                      : t('Appearance.imported.skipped', {
+                          name: result.theme.name,
+                          skipped: result.skipped.join(', '),
+                        }),
                 })
               })
             }
           >
-            Import…
+            {t('Appearance.import')}
           </button>
           <button
             type="button"
@@ -358,27 +391,27 @@ export function AppStyling(props: { active: boolean }): React.JSX.Element {
             onClick={() =>
               void run(async () => {
                 if (await window.goonlib.theme.export(draft)) {
-                  setMessage({ ok: true, text: `Exported “${draft.name}”.` })
+                  setMessage({ ok: true, text: t('Appearance.exported', { name: draft.name }) })
                 }
               })
             }
           >
-            Export…
+            {t('Appearance.export')}
           </button>
         </div>
 
         {message ? <span className={message.ok ? 'settings__ok' : 'settings__bad'}>{message.text}</span> : null}
 
         <span className="settings__hint">
-          Your themes are files in{' '}
+          {t('Appearance.files')}{' '}
           <button type="button" className="styling__link" onClick={() => void window.goonlib.theme.revealFolder()}>
-            the themes folder
+            {t('Appearance.themesFolder')}
           </button>
         </span>
 
         {state.problems.length > 0 ? (
           <div className="styling__problems">
-            <span className="settings__label">Skipped while reading your themes</span>
+            <span className="settings__label">{t('Appearance.problems')}</span>
             <ul>
               {state.problems.map((problem) => (
                 <li key={problem}>{problem}</li>
@@ -410,12 +443,12 @@ function ColorGroup(props: {
 }): React.JSX.Element {
   return (
     <div className="styling__group">
-      <span className="styling__grouptitle">{props.group.title}</span>
+      <span className="styling__grouptitle">{t(props.group.title)}</span>
       {props.group.keys.map(({ key, label }) => (
         <ColorField
           key={key}
           themeKey={key}
-          label={label}
+          label={t(label)}
           own={props.draft.colors[key]}
           shown={props.resolved[key] ?? '#000000'}
           onChange={(value) => props.onChange(key, value)}
@@ -467,22 +500,22 @@ function ColorField(props: {
       <input
         className="settings__input styling__hex"
         value={text}
-        placeholder={`${props.shown} · auto`}
+        placeholder={t('Appearance.colour.auto', { colour: props.shown })}
         spellCheck={false}
         onChange={(event) => setText(event.target.value)}
         onBlur={commit}
         onKeyDown={(event) => {
           if (event.key === 'Enter') commit()
         }}
-        aria-label={`${props.label}, as text`}
+        aria-label={t('Appearance.colour.asText', { label: props.label })}
       />
       {props.own ? (
         <button
           type="button"
           className="styling__reset"
           onClick={() => props.onChange(null)}
-          title="Go back to following the base colours"
-          aria-label={`Reset ${props.label}`}
+          title={t('Appearance.reset.title')}
+          aria-label={t('Appearance.reset', { label: props.label })}
         >
           ×
         </button>
@@ -498,15 +531,17 @@ function ThemePreview({ vars }: { vars: Record<string, string> }): React.JSX.Ele
   return (
     <div className="themeprev" style={vars as React.CSSProperties} aria-hidden="true">
       <div className="themeprev__side">
-        <span className="themeprev__nav themeprev__nav--on">Library</span>
-        <span className="themeprev__nav">Favorites</span>
-        <span className="themeprev__nav themeprev__nav--muted">Collections</span>
+        <span className="themeprev__nav themeprev__nav--on">{t('Appearance.colour.library')}</span>
+        <span className="themeprev__nav">{t('Appearance.colour.favorites')}</span>
+        <span className="themeprev__nav themeprev__nav--muted">
+          {t('Appearance.colour.collections')}
+        </span>
       </div>
       <div className="themeprev__main">
         <div className="themeprev__toolbar">
-          <span className="themeprev__search">Search…</span>
-          <span className="themeprev__button">Random</span>
-          <span className="themeprev__chip">On</span>
+          <span className="themeprev__search">{t('Appearance.colour.search')}</span>
+          <span className="themeprev__button">{t('Appearance.colour.random')}</span>
+          <span className="themeprev__chip">{t('Appearance.colour.on')}</span>
         </div>
         <div className="themeprev__grid">
           <span className="themeprev__card" />
@@ -519,8 +554,12 @@ function ThemePreview({ vars }: { vars: Record<string, string> }): React.JSX.Ele
           <span className="themeprev__track">
             <span className="themeprev__progress" />
           </span>
-          <span className="themeprev__status themeprev__status--ok">Saved</span>
-          <span className="themeprev__status themeprev__status--bad">Stop</span>
+          <span className="themeprev__status themeprev__status--ok">
+            {t('Appearance.colour.saved')}
+          </span>
+          <span className="themeprev__status themeprev__status--bad">
+            {t('Appearance.colour.stop')}
+          </span>
         </div>
       </div>
     </div>

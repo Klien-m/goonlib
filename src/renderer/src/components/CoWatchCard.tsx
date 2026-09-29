@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { CoWatchView } from '../state/useCoWatch'
 import { CoWatchSection, SessionName } from './CoWatchPanel'
 import { GearIcon } from './Toolbar'
+import { t } from '../i18n'
 
 /**
  * Starting and managing a session, as a card.
@@ -38,15 +39,15 @@ export function CoWatchCard({
       className="prompt"
       role="dialog"
       aria-modal="true"
-      aria-label="Watch Together"
+      aria-label={t('CoWatch.title')}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
     >
       <div className="settings cowatchcard">
         <header className="settings__head">
-          <h2 className="settings__title">Watch Together</h2>
-          <button type="button" className="lightbox__close" onClick={onClose} aria-label="Close">
+          <h2 className="settings__title">{t('CoWatch.title')}</h2>
+          <button type="button" className="lightbox__close" onClick={onClose} aria-label={t('CoWatch.close')}>
             ×
           </button>
         </header>
@@ -69,10 +70,10 @@ export function CoWatchCard({
               type="button"
               className="icon-button"
               onClick={onOpenSettings}
-              title="Guest permissions and other Watch Together settings"
+              title={t('CoWatch.settings.title')}
             >
               <GearIcon />
-              <span className="visually-hidden">Watch Together settings</span>
+              <span className="visually-hidden">{t('CoWatch.settings')}</span>
             </button>
           </div>
         </div>

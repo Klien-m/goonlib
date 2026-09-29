@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { FolderLocation, FolderNode, Root } from '@shared/types'
 import { formatCount } from '../format'
+import { t } from '../i18n'
 
 /**
  * Where a top-level folder row starts, chosen so its name lands at the same
@@ -38,7 +39,7 @@ export function FolderTree(props: FolderTreeProps): React.JSX.Element {
         style={{ paddingLeft: ROW_INDENT }}
       >
         <span className="tree__twist" />
-        <span className="tree__label">All folders</span>
+        <span className="tree__label">{t('Sidebar.allFolders')}</span>
       </button>
 
       {roots.map((root) => (
@@ -133,7 +134,13 @@ function FolderBranch(props: FolderBranchProps): React.JSX.Element {
           className={expandable ? 'tree__twist tree__twist--able' : 'tree__twist'}
           onClick={expandable ? toggle : undefined}
           role={expandable ? 'button' : undefined}
-          aria-label={expandable ? (open ? `Collapse ${name}` : `Expand ${name}`) : undefined}
+          aria-label={
+            expandable
+              ? open
+                ? t('Folder.collapseName', { name })
+                : t('Folder.expandName', { name })
+              : undefined
+          }
         >
           {expandable ? <Chevron open={open} /> : null}
         </span>
@@ -165,7 +172,7 @@ function FolderBranch(props: FolderBranchProps): React.JSX.Element {
 
       {open && loading ? (
         <div className="tree__loading" style={{ paddingLeft: ROW_INDENT + (depth + 1) * DEPTH_STEP }}>
-          Loading…
+          {t('FolderTree.loading')}
         </div>
       ) : null}
 
@@ -177,7 +184,7 @@ function FolderBranch(props: FolderBranchProps): React.JSX.Element {
 
       {open && !error && children?.length === 0 && !loading ? (
         <div className="tree__loading" style={{ paddingLeft: ROW_INDENT + (depth + 1) * DEPTH_STEP }}>
-          No subfolders
+          {t('FolderTree.none')}
         </div>
       ) : null}
     </>

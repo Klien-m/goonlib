@@ -3,6 +3,7 @@ import type { Tag } from '@shared/types'
 import { formatCount } from '../format'
 import { TagIcon } from './SidebarIcons'
 import { matchesFilter, SidebarSection, useSectionFilter } from './SidebarSection'
+import { t } from '../i18n'
 
 export interface TagListProps {
   tags: Tag[]
@@ -41,7 +42,7 @@ export function TagList(props: TagListProps): React.JSX.Element {
 
   return (
     <SidebarSection
-      title="Tags"
+      title={t('Sidebar.tags')}
       id="tags"
       count={shown.length}
       icon={<TagIcon />}
@@ -50,7 +51,7 @@ export function TagList(props: TagListProps): React.JSX.Element {
     >
 
       {shown.length === 0 && !creating ? (
-        <p className="muted">{tags.length === 0 ? 'None yet.' : 'None of those here.'}</p>
+        <p className="muted">{tags.length === 0 ? t('Section.empty.none') : t('Section.empty.hidden')}</p>
       ) : (
         // Capped and scrollable: a classified library can easily produce more
         // tags than collections, and it must not push the folder tree off-screen.
@@ -92,7 +93,7 @@ export function TagList(props: TagListProps): React.JSX.Element {
                     <span className="collection__label">
                       {tag.name}
                       {tag.count > 0 && tag.aiCount === tag.count ? (
-                        <span className="tag__ai" aria-label="suggested by AI">
+                        <span className="tag__ai" aria-label={t('Section.filter.ai')}>
                           ai
                         </span>
                       ) : null}
@@ -103,8 +104,8 @@ export function TagList(props: TagListProps): React.JSX.Element {
                     type="button"
                     className="root__remove"
                     onClick={() => onDelete(tag)}
-                    aria-label={`Delete the tag ${tag.name}`}
-                    title="Delete tag (your files are not touched)"
+                    aria-label={t('Tag.delete.aria', { name: tag.name })}
+                    title={t('Tag.delete.title')}
                   >
                     ×
                   </button>
@@ -118,7 +119,7 @@ export function TagList(props: TagListProps): React.JSX.Element {
       {creating ? (
         <input
           className="collection__input"
-          placeholder="Tag name"
+          placeholder={t('Selection.searchTag')}
           value={draft}
           autoFocus
           onChange={(event) => setDraft(event.target.value)}
@@ -133,7 +134,7 @@ export function TagList(props: TagListProps): React.JSX.Element {
         />
       ) : (
         <button type="button" className="button button--quiet" onClick={() => setCreating(true)}>
-          New tag
+          {t('Selection.addTag')}
         </button>
       )}
     </SidebarSection>
@@ -141,8 +142,12 @@ export function TagList(props: TagListProps): React.JSX.Element {
 }
 
 function describe(tag: Tag): string {
-  const base = `${tag.name} - double-click to rename`
+  const base = t('Tag.rename.title', { name: tag.name })
   if (tag.count === 0 || tag.aiCount === 0) return base
-  if (tag.aiCount === tag.count) return `${base}. Every use was suggested by AI.`
-  return `${base}. ${formatCount(tag.aiCount)} of ${formatCount(tag.count)} suggested by AI.`
+  if (tag.aiCount === tag.count) return t('Tag.allAi', { base })
+  return t('Tag.someAi', {
+    base,
+    ai: formatCount(tag.aiCount),
+    count: formatCount(tag.count),
+  })
 }

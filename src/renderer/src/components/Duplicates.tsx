@@ -4,6 +4,7 @@ import { formatBytes, formatCount, formatDuration } from '../format'
 import { REVEAL_LABEL, REVEAL_SHORT, TRASH_NAME } from '../platform'
 import { markAllButLargest } from '../selection'
 import { HeartIcon } from './Toolbar'
+import { t } from '../i18n'
 
 export interface DuplicatesProps {
   onChanged: () => void
@@ -96,7 +97,7 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
   if (loading) {
     return (
       <div className="empty">
-        <h2 className="empty__title">Looking for duplicates…</h2>
+        <h2 className="empty__title">{t('Dupes.loading')}</h2>
       </div>
     )
   }
@@ -104,7 +105,7 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
   if (error) {
     return (
       <div className="empty" role="alert">
-        <h2 className="empty__title">Couldn&apos;t check for duplicates</h2>
+        <h2 className="empty__title">{t('Dupes.error')}</h2>
         <p className="empty__body">{error}</p>
       </div>
     )
@@ -113,14 +114,14 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
   if (groups.length === 0) {
     return (
       <div className="empty">
-        <h2 className="empty__title">No duplicates found</h2>
+        <h2 className="empty__title">{t('Dupes.none')}</h2>
         <p className="empty__body">
           {report && report.pending > 0
-            ? `${formatCount(report.pending)} items haven't been fingerprinted yet, so this isn't the whole picture. Run a scan to finish.`
-            : 'Every file in the library is distinct.'}
+            ? t('Dupes.none.pending', { count: formatCount(report.pending) })
+            : t('Dupes.none.distinct')}
         </p>
         <button type="button" className="button" onClick={() => void load()}>
-          Re-scan
+          {t('Dupes.rescan')}
         </button>
       </div>
     )
@@ -147,16 +148,16 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
     <div className="dupes">
       <div className="dupes__bar">
         <div className="dupes__title">
-          <h2 className="dupes__heading">Duplicates</h2>
+          <h2 className="dupes__heading">{t('Dupes.title')}</h2>
           <span className="dupes__summary">
-            <strong>{formatCount(groups.length)}</strong> duplicates found ·{' '}
-            <strong>{formatBytes(reclaimable)}</strong> reclaimable
+            {t('Dupes.found', { count: formatCount(groups.length) })} ·{' '}
+            {t('Dupes.reclaimable', { size: formatBytes(reclaimable) })}
           </span>
         </div>
 
         {report && report.pending > 0 ? (
           <span className="dupes__warn">
-            {formatCount(report.pending)} not yet fingerprinted
+            {t('Dupes.pending', { count: formatCount(report.pending) })}
           </span>
         ) : null}
 
@@ -164,15 +165,16 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
 
         {selected.size > 0 ? (
           <span className="muted">
-            {formatCount(selected.size)} selected · {formatBytes(selectedBytes)}
+            {t('Dupes.selected', { count: formatCount(selected.size) })} ·{' '}
+            {formatBytes(selectedBytes)}
             {keptFavorites.size > 0 ? (
               <>
                 {' · '}
                 <span
                   className="dupes__spared"
-                  title="A hearted copy is the one kept, in place of the largest. Untick it to include it instead."
+                  title={t('Dupes.spared.title')}
                 >
-                  {formatCount(keptFavorites.size)} favourites preserved
+                  {t('Dupes.spared', { count: formatCount(keptFavorites.size) })}
                 </span>
               </>
             ) : null}
@@ -187,9 +189,9 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
             setSelected(new Set())
             void load()
           }}
-          title="Look for duplicates again, for anything added or removed since"
+          title={t('Dupes.rescan.title')}
         >
-          Re-scan
+          {t('Dupes.rescan')}
         </button>
 
         <button
@@ -197,9 +199,9 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
           className="button button--quiet"
           disabled={busy}
           onClick={() => selectAllButLargest(groups)}
-          title="Marks every copy but one in each group, so one of everything is left behind. The one kept is the largest, or the hearted copy where there is one."
+          title={t('Dupes.selectAll.title')}
         >
-          Select all duplicates
+          {t('Dupes.selectAll')}
         </button>
 
         {selected.size > 0 ? (
@@ -209,7 +211,7 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
             disabled={busy}
             onClick={() => setSelected(new Set())}
           >
-            Clear
+            {t('Dupes.clear')}
           </button>
         ) : null}
 
@@ -218,9 +220,9 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
           className="button"
           disabled={selected.size === 0 || busy}
           onClick={() => void trashSelected()}
-          title="Moves the selected files to the system Trash after confirmation"
+          title={t('Dupes.move.title')}
         >
-          {busy ? 'Moving…' : `Move selected to ${TRASH_NAME}`}
+          {busy ? t('Dupes.moving') : t('Dupes.move', { trash: TRASH_NAME })}
         </button>
       </div>
 
@@ -256,14 +258,16 @@ function Group({
     <section className="dupe-group">
       <header className="dupe-group__head">
         <span className={group.kind === 'exact' ? 'tag tag--exact' : 'tag tag--near'}>
-          {group.kind === 'exact' ? 'identical' : `similar · ${group.distance} bits`}
+          {group.kind === 'exact'
+            ? t('Dupes.identical')
+            : t('Dupes.similar', { distance: group.distance })}
         </span>
         <span className="muted">
-          {group.items.length} copies · {formatBytes(group.reclaimable)} reclaimable
+          {t('Dupes.copies', { count: group.items.length, size: formatBytes(group.reclaimable) })}
         </span>
         <span className="dupes__spacer" />
         <button type="button" className="button button--quiet" onClick={onSelectAllButFirst}>
-          Select all but the largest
+          {t('Dupes.allButLargest')}
         </button>
       </header>
 
@@ -309,7 +313,7 @@ function Candidate({
         <div className="candidate__name" title={item.relPath}>
           {item.favoritedAt !== null ? (
             // Said here because this screen is where copies get trashed.
-            <span className="candidate__heart" title="Favorite - never marked for you">
+            <span className="candidate__heart" title={t('Dupes.favorite.title')}>
               <HeartIcon filled size={12} />
             </span>
           ) : null}
@@ -319,7 +323,7 @@ function Candidate({
           {formatBytes(item.size)}
           {item.width && item.height ? ` · ${item.width}×${item.height}` : ''}
           {item.durationMs ? ` · ${formatDuration(item.durationMs)}` : ''}
-          {isLargest ? ' · largest' : ''}
+          {isLargest ? ` · ${t('Dupes.largest')}` : ''}
         </div>
         <div className="candidate__path" title={item.relPath}>
           <bdi>{item.relPath}</bdi>

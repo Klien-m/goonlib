@@ -15,57 +15,62 @@ export type KeyContext = 'library' | 'viewer'
 
 export interface KeyAction {
   id: string
+  /**
+   * A catalogue key, not the words. The list is built once at import, before
+   * anything knows which language is showing, and the Shortcuts page is the
+   * only place these are read.
+   */
   label: string
   context: KeyContext
   /** Bindings this action answers to unless it has been changed. */
   defaults: string[]
-  /** Grouped under this heading on the Shortcuts page. */
+  /** The catalogue key of the heading it sits under on the Shortcuts page. */
   group: string
 }
 
 export const KEY_ACTIONS: KeyAction[] = [
   // --- the library
-  { id: 'library.search', label: 'Search the library', context: 'library', defaults: ['Mod+F'], group: 'Library' },
-  { id: 'library.filters', label: 'Open Filters', context: 'library', defaults: ['F'], group: 'Library' },
-  { id: 'library.kindAll', label: 'Show everything', context: 'library', defaults: ['1'], group: 'Library' },
-  { id: 'library.kindImages', label: 'Show images only', context: 'library', defaults: ['2'], group: 'Library' },
-  { id: 'library.kindVideos', label: 'Show videos only', context: 'library', defaults: ['3'], group: 'Library' },
-  { id: 'library.selectAll', label: 'Select everything', context: 'library', defaults: ['Mod+A'], group: 'Library' },
-  { id: 'library.trash', label: 'Move selection to Trash', context: 'library', defaults: ['Backspace', 'Delete'], group: 'Library' },
-  { id: 'library.undo', label: 'Undo a delete', context: 'library', defaults: ['Mod+Z'], group: 'Library' },
-  { id: 'library.redo', label: 'Redo a delete', context: 'library', defaults: ['Mod+Shift+Z', 'Mod+Y'], group: 'Library' },
+  { id: 'library.search', label: 'Keys.library.search', context: 'library', defaults: ['Mod+F'], group: 'Keys.group.library' },
+  { id: 'library.filters', label: 'Keys.library.filters', context: 'library', defaults: ['F'], group: 'Keys.group.library' },
+  { id: 'library.kindAll', label: 'Keys.library.kindAll', context: 'library', defaults: ['1'], group: 'Keys.group.library' },
+  { id: 'library.kindImages', label: 'Keys.library.kindImages', context: 'library', defaults: ['2'], group: 'Keys.group.library' },
+  { id: 'library.kindVideos', label: 'Keys.library.kindVideos', context: 'library', defaults: ['3'], group: 'Keys.group.library' },
+  { id: 'library.selectAll', label: 'Keys.library.selectAll', context: 'library', defaults: ['Mod+A'], group: 'Keys.group.library' },
+  { id: 'library.trash', label: 'Keys.library.trash', context: 'library', defaults: ['Backspace', 'Delete'], group: 'Keys.group.library' },
+  { id: 'library.undo', label: 'Keys.library.undo', context: 'library', defaults: ['Mod+Z'], group: 'Keys.group.library' },
+  { id: 'library.redo', label: 'Keys.library.redo', context: 'library', defaults: ['Mod+Shift+Z', 'Mod+Y'], group: 'Keys.group.library' },
 
   // --- the viewer
-  { id: 'viewer.close', label: 'Close the viewer', context: 'viewer', defaults: ['Escape'], group: 'Viewer' },
-  { id: 'viewer.next', label: 'Next item', context: 'viewer', defaults: ['ArrowRight', ']'], group: 'Viewer' },
-  { id: 'viewer.previous', label: 'Previous item', context: 'viewer', defaults: ['ArrowLeft', '['], group: 'Viewer' },
-  { id: 'viewer.favorite', label: 'Favorite', context: 'viewer', defaults: ['H'], group: 'Viewer' },
-  { id: 'viewer.trash', label: 'Move to Trash', context: 'viewer', defaults: ['Backspace', 'Delete'], group: 'Viewer' },
-  { id: 'viewer.shuffle', label: 'Shuffle on or off', context: 'viewer', defaults: ['S'], group: 'Viewer' },
-  { id: 'viewer.random', label: 'Open something at random', context: 'viewer', defaults: ['R'], group: 'Viewer' },
-  { id: 'viewer.loop', label: 'Loop this item', context: 'viewer', defaults: ['O'], group: 'Viewer' },
-  { id: 'viewer.details', label: 'Show or hide the details', context: 'viewer', defaults: ['I'], group: 'Viewer' },
+  { id: 'viewer.close', label: 'Keys.viewer.close', context: 'viewer', defaults: ['Escape'], group: 'Keys.group.viewer' },
+  { id: 'viewer.next', label: 'Keys.viewer.next', context: 'viewer', defaults: ['ArrowRight', ']'], group: 'Keys.group.viewer' },
+  { id: 'viewer.previous', label: 'Keys.viewer.previous', context: 'viewer', defaults: ['ArrowLeft', '['], group: 'Keys.group.viewer' },
+  { id: 'viewer.favorite', label: 'Keys.viewer.favorite', context: 'viewer', defaults: ['H'], group: 'Keys.group.viewer' },
+  { id: 'viewer.trash', label: 'Keys.viewer.trash', context: 'viewer', defaults: ['Backspace', 'Delete'], group: 'Keys.group.viewer' },
+  { id: 'viewer.shuffle', label: 'Keys.viewer.shuffle', context: 'viewer', defaults: ['S'], group: 'Keys.group.viewer' },
+  { id: 'viewer.random', label: 'Keys.viewer.random', context: 'viewer', defaults: ['R'], group: 'Keys.group.viewer' },
+  { id: 'viewer.loop', label: 'Keys.viewer.loop', context: 'viewer', defaults: ['O'], group: 'Keys.group.viewer' },
+  { id: 'viewer.details', label: 'Keys.viewer.details', context: 'viewer', defaults: ['I'], group: 'Keys.group.viewer' },
 
   // --- playing
-  { id: 'player.playPause', label: 'Play or pause', context: 'viewer', defaults: ['Space', 'K'], group: 'Playing' },
-  { id: 'player.back', label: 'Back ten seconds', context: 'viewer', defaults: ['J'], group: 'Playing' },
-  { id: 'player.forward', label: 'On ten seconds', context: 'viewer', defaults: ['L'], group: 'Playing' },
-  { id: 'player.backShort', label: 'Back five seconds', context: 'viewer', defaults: ['Shift+ArrowLeft'], group: 'Playing' },
-  { id: 'player.forwardShort', label: 'On five seconds', context: 'viewer', defaults: ['Shift+ArrowRight'], group: 'Playing' },
-  { id: 'player.frameBack', label: 'A frame back', context: 'viewer', defaults: [','], group: 'Playing' },
-  { id: 'player.frameForward', label: 'A frame on', context: 'viewer', defaults: ['.'], group: 'Playing' },
-  { id: 'player.slower', label: 'Play slower', context: 'viewer', defaults: ['Shift+,'], group: 'Playing' },
-  { id: 'player.faster', label: 'Play faster', context: 'viewer', defaults: ['Shift+.'], group: 'Playing' },
-  { id: 'player.volumeUp', label: 'Louder', context: 'viewer', defaults: ['ArrowUp'], group: 'Playing' },
-  { id: 'player.volumeDown', label: 'Quieter', context: 'viewer', defaults: ['ArrowDown'], group: 'Playing' },
-  { id: 'player.mute', label: 'Mute', context: 'viewer', defaults: ['M'], group: 'Playing' },
-  { id: 'player.fullscreen', label: 'Fullscreen', context: 'viewer', defaults: ['F'], group: 'Playing' },
+  { id: 'player.playPause', label: 'Keys.player.playPause', context: 'viewer', defaults: ['Space', 'K'], group: 'Keys.group.playing' },
+  { id: 'player.back', label: 'Keys.player.back', context: 'viewer', defaults: ['J'], group: 'Keys.group.playing' },
+  { id: 'player.forward', label: 'Keys.player.forward', context: 'viewer', defaults: ['L'], group: 'Keys.group.playing' },
+  { id: 'player.backShort', label: 'Keys.player.backShort', context: 'viewer', defaults: ['Shift+ArrowLeft'], group: 'Keys.group.playing' },
+  { id: 'player.forwardShort', label: 'Keys.player.forwardShort', context: 'viewer', defaults: ['Shift+ArrowRight'], group: 'Keys.group.playing' },
+  { id: 'player.frameBack', label: 'Keys.player.frameBack', context: 'viewer', defaults: [','], group: 'Keys.group.playing' },
+  { id: 'player.frameForward', label: 'Keys.player.frameForward', context: 'viewer', defaults: ['.'], group: 'Keys.group.playing' },
+  { id: 'player.slower', label: 'Keys.player.slower', context: 'viewer', defaults: ['Shift+,'], group: 'Keys.group.playing' },
+  { id: 'player.faster', label: 'Keys.player.faster', context: 'viewer', defaults: ['Shift+.'], group: 'Keys.group.playing' },
+  { id: 'player.volumeUp', label: 'Keys.player.volumeUp', context: 'viewer', defaults: ['ArrowUp'], group: 'Keys.group.playing' },
+  { id: 'player.volumeDown', label: 'Keys.player.volumeDown', context: 'viewer', defaults: ['ArrowDown'], group: 'Keys.group.playing' },
+  { id: 'player.mute', label: 'Keys.player.mute', context: 'viewer', defaults: ['M'], group: 'Keys.group.playing' },
+  { id: 'player.fullscreen', label: 'Keys.player.fullscreen', context: 'viewer', defaults: ['F'], group: 'Keys.group.playing' },
 
   // --- the toy, wherever you are
-  { id: 'toy.stop', label: 'Stop the toy', context: 'library', defaults: ['X'], group: 'Toy' },
+  { id: 'toy.stop', label: 'Keys.toy.stop', context: 'library', defaults: ['X'], group: 'Keys.group.toy' },
 
   // --- this list
-  { id: 'app.shortcuts', label: 'Show the shortcuts', context: 'library', defaults: ['?'], group: 'Help' },
+  { id: 'app.shortcuts', label: 'Keys.app.shortcuts', context: 'library', defaults: ['?'], group: 'Keys.group.help' },
 ]
 
 export type KeyBindings = Record<string, string[]>

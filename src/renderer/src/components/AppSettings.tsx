@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { CONTINUE_COUNT, IMAGE_SECONDS, RESUME_AFTER } from '@shared/types'
 import type { PlaybackPrefs } from '@shared/types'
+import { LanguageSettings } from './LanguageSettings'
 import { NumberField, Slider, Switch } from './SettingsControls'
 import { UpdateSettings } from './UpdateSettings'
+import { t } from '../i18n'
 
 /**
  * Settings → App: how the app itself behaves, starting with the media player.
@@ -18,10 +20,12 @@ export function AppSettings(props: {
 
   return (
     <>
+      <LanguageSettings />
+
       <UpdateSettings playback={playback} onPlaybackChange={props.onPlaybackChange} />
 
       <div className="settings__group settings__section">
-        <span className="settings__label">Media Player</span>
+        <span className="settings__label">{t('App.player.label')}</span>
 
         <ImageSeconds
           value={playback.imageSeconds}
@@ -29,53 +33,53 @@ export function AppSettings(props: {
         />
 
         <Switch
-          label="Play on open"
-          hint="Toggles whether to play videos on open by default."
+          label={t('App.player.playOnOpen')}
+          hint={t('App.player.playOnOpen.hint')}
           checked={playback.playOnOpen}
           onChange={(playOnOpen) => props.onPlaybackChange({ playOnOpen })}
         />
 
         <Switch
-          label="Shuffle as default"
-          hint="Globally enables shuffle=true as default when playing any media items."
+          label={t('App.player.shuffle')}
+          hint={t('App.player.shuffle.hint')}
           checked={playback.shuffleDefault}
           onChange={(shuffleDefault) => props.onPlaybackChange({ shuffleDefault })}
         />
 
 
         <Switch
-          label="Show Meta data"
-          hint="Shows the open item's details beside it in the media player: file, size, dates, and how often and how long it has been watched."
+          label={t('App.player.showMetadata')}
+          hint={t('App.player.showMetadata.hint')}
           checked={playback.showMetadata}
           onChange={(showMetadata) => props.onPlaybackChange({ showMetadata })}
         />
 
         <Switch
-          label="Show description"
-          hint="Part of what the viewer's description button shows: the description itself."
+          label={t('App.player.showDescription')}
+          hint={t('App.player.showDescription.hint')}
           checked={playback.showCaption}
           disabled={!playback.showDescription}
           onChange={(showCaption) => props.onPlaybackChange({ showCaption })}
         />
 
         <Switch
-          label="Show tags"
-          hint="The other part: the item's tags, over the media."
+          label={t('App.player.showTags')}
+          hint={t('App.player.showTags.hint')}
           checked={playback.showTags}
           disabled={!playback.showDescription}
           onChange={(showTags) => props.onPlaybackChange({ showTags })}
         />
 
         <Switch
-          label="Show EXIF data"
-          hint="Shows a photo's EXIF data, if it has any: camera, lens, settings and the date it was taken."
+          label={t('App.player.showExif')}
+          hint={t('App.player.showExif.hint')}
           checked={playback.showExif}
           onChange={(showExif) => props.onPlaybackChange({ showExif })}
         />
 
         <Switch
-          label="Include Location"
-          hint="Whether to also include location information in shown EXIF data"
+          label={t('App.player.showLocation')}
+          hint={t('App.player.showLocation.hint')}
           checked={playback.showLocation}
           disabled={!playback.showExif}
           onChange={(showLocation) => props.onPlaybackChange({ showLocation })}
@@ -101,18 +105,18 @@ function WatchHistory(props: {
 
   return (
     <div className="settings__group settings__section">
-      <span className="settings__label">Watch history</span>
+      <span className="settings__label">{t('App.history.label')}</span>
 
       <Switch
-        label="Keep watch history"
-        hint="Counts how often each item is opened and how long it is watched for."
+        label={t('App.history.keep')}
+        hint={t('App.history.keep.hint')}
         checked={playback.keepHistory}
         onChange={(keepHistory) => props.onPlaybackChange({ keepHistory })}
       />
 
       <Switch
-        label="Remember playback position"
-        hint="Notes where a video was left and carries on from there next time. A video watched to the end starts fresh."
+        label={t('App.history.resume')}
+        hint={t('App.history.resume.hint')}
         checked={playback.resumePosition}
         onChange={(resumePosition) => props.onPlaybackChange({ resumePosition })}
       />
@@ -121,29 +125,29 @@ function WatchHistory(props: {
           minute is nothing in a film and most of a clip, and a library has
           plenty of both. */}
       <Slider
-        label="Remember after"
-        hint="How far into a video you must be before the place is kept. A video whose length is not known yet needs a minute."
+        label={t('App.history.after')}
+        hint={t('App.history.after.hint')}
         min={RESUME_AFTER.min}
         max={RESUME_AFTER.max}
         step={5}
         value={playback.resumeAfterPercent}
         disabled={!playback.resumePosition}
-        format={(value) => (value === 0 ? 'Any point' : `${value}%`)}
+        format={(value) => (value === 0 ? t('App.history.after.any') : `${value}%`)}
         onChange={(resumeAfterPercent) => props.onPlaybackChange({ resumeAfterPercent })}
       />
 
       <Switch
-        label="Show Continue watching"
-        hint="A row of part-watched videos above the library."
+        label={t('App.history.continue')}
+        hint={t('App.history.continue.hint')}
         checked={playback.showContinue}
         disabled={!playback.resumePosition}
         onChange={(showContinue) => props.onPlaybackChange({ showContinue })}
       />
 
       <NumberField
-        label="Continue watching holds"
-        hint="The most it will keep. The row scrolls sideways once they no longer fit."
-        suffix="items"
+        label={t('App.history.holds')}
+        hint={t('App.history.holds.hint')}
+        suffix={t('App.history.holds.suffix')}
         min={CONTINUE_COUNT.min}
         max={CONTINUE_COUNT.max}
         value={playback.continueCount}
@@ -183,10 +187,10 @@ function ClearHistory({ onCleared }: { onCleared: () => void }): React.JSX.Eleme
                 .catch(() => undefined)
             }}
           >
-            Really clear?
+            {t('App.history.clear.confirm')}
           </button>
           <button type="button" className="button button--quiet" onClick={() => setConfirming(false)}>
-            Cancel
+            {t('App.history.clear.cancel')}
           </button>
         </>
       ) : (
@@ -197,13 +201,15 @@ function ClearHistory({ onCleared }: { onCleared: () => void }): React.JSX.Eleme
             setGone(null)
             setConfirming(true)
           }}
-          title="Forget every count, time watched and playback position"
+          title={t('App.history.clear.title')}
         >
-          Clear watch history
+          {t('App.history.clear')}
         </button>
       )}
       {gone !== null ? (
-        <span className="muted">{gone === 0 ? 'Nothing to clear' : `Cleared ${gone}`}</span>
+        <span className="muted">
+          {gone === 0 ? t('App.history.clear.nothing') : t('App.history.clear.done', { count: gone })}
+        </span>
       ) : null}
     </div>
   )
@@ -231,7 +237,7 @@ function ImageSeconds(props: { value: number; onChange: (seconds: number) => voi
 
   return (
     <label className="settings__field">
-      <span className="settings__label">Image autoplay timer</span>
+      <span className="settings__label">{t('App.player.imageSeconds.label')}</span>
       <span className="settings__row">
         <input
           type="number"
@@ -247,11 +253,10 @@ function ImageSeconds(props: { value: number; onChange: (seconds: number) => voi
           }}
           aria-describedby="image-seconds-hint"
         />
-        <span className="settings__hint">seconds</span>
+        <span className="settings__hint">{t('App.player.imageSeconds.suffix')}</span>
       </span>
       <span className="settings__hint" id="image-seconds-hint">
-        Required for auto-playing images. Sets the time until next image is displayed when autoplay is
-        enabled
+        {t('App.player.imageSeconds.hint')}
       </span>
     </label>
   )

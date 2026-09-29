@@ -628,6 +628,8 @@ class Toys extends EventEmitter {
       maxIntensity: this.prefs.guestMaxIntensity,
       maxSeconds: this.prefs.guestMaxSeconds,
       patterns: [
+        // The labels travel as catalogue keys, not as words: the guests' page
+        // is drawn in the browser and does its own translating.
         ...TOY_PATTERNS.map((pattern) => ({ id: pattern.id, label: pattern.label })),
         ...this.patterns.map((pattern) => ({ id: customPatternId(pattern.id), label: pattern.name })),
       ],

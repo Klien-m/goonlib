@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { describeBinding, KEY_ACTIONS } from '@shared/keys'
 import { useBindings } from '../keys'
 import { IS_MAC, withTrashName } from '../platform'
+import { t } from '../i18n'
 
 /**
  * Every shortcut, as a card. Read-only on purpose: this is what you open
@@ -26,15 +27,15 @@ export function ShortcutsCard({ onClose }: { onClose: () => void }): React.JSX.E
       className="prompt"
       role="dialog"
       aria-modal="true"
-      aria-label="Keyboard shortcuts"
+      aria-label={t('Shortcuts.card.title')}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
     >
       <div className="settings shortcuts">
         <header className="settings__head">
-          <h2 className="settings__title">Keyboard shortcuts</h2>
-          <button type="button" className="lightbox__close" onClick={onClose} aria-label="Close">
+          <h2 className="settings__title">{t('Shortcuts.card.title')}</h2>
+          <button type="button" className="lightbox__close" onClick={onClose} aria-label={t('Shortcuts.card.close')}>
             ×
           </button>
         </header>
@@ -42,14 +43,14 @@ export function ShortcutsCard({ onClose }: { onClose: () => void }): React.JSX.E
         <div className="settings__body shortcuts__body">
           {groups.map((group) => (
             <section key={group}>
-              <h3 className="mediainfo__title">{group}</h3>
+              <h3 className="mediainfo__title">{t(group)}</h3>
               <dl className="shortcuts__list">
                 {KEY_ACTIONS.filter((action) => action.group === group).map((action) => (
                   <div key={action.id} className="shortcuts__row">
-                    <dt>{withTrashName(action.label)}</dt>
+                    <dt>{withTrashName(t(action.label))}</dt>
                     <dd>
                       {(bindings[action.id] ?? []).length === 0 ? (
-                        <span className="muted">unset</span>
+                        <span className="muted">{t('Shortcuts.card.unset')}</span>
                       ) : (
                         (bindings[action.id] ?? []).map((binding) => (
                           <kbd key={binding} className="shortcuts__key">

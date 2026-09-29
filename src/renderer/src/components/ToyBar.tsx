@@ -3,6 +3,7 @@ import type { ToyStatus } from '@shared/types'
 import type { ToyView } from '../state/useToy'
 import { patternLabel } from './ToySections'
 import type { PlayerClock } from './VideoPlayer'
+import { t } from '../i18n'
 
 /** Points the curve is drawn with. About one per two pixels of a wide player. */
 const CURVE_POINTS = 400
@@ -81,7 +82,7 @@ export function ToyBar({ toy, mediaId, clock }: ToyBarProps): React.JSX.Element 
         <Trace points={trace} />
       )}
 
-      <span className="toybar__level" aria-label="Strength right now">
+      <span className="toybar__level" aria-label={t('Toy.strength')}>
         <span className="toybar__level-fill" style={{ height: `${status.level * 100}%` }} />
       </span>
     </div>
@@ -105,7 +106,7 @@ function Curve({
     <div
       className="toybar__track toybar__track--seekable"
       role="slider"
-      aria-label="Toy pattern - click to seek"
+      aria-label={t('Toy.patternSeek')}
       aria-valuemin={0}
       aria-valuemax={Math.round(clock.duration)}
       aria-valuenow={Math.round(clock.currentTime)}
@@ -305,10 +306,10 @@ function areaPath(curve: number[]): string {
 }
 
 function label(status: ToyStatus, scripted: boolean): string {
-  if (!status.armed) return 'Stopped'
-  if (scripted) return status.script.kind === 'funscript' ? 'Script' : 'Sound'
+  if (!status.armed) return t('Toy.stopped')
+  if (scripted) return status.script.kind === 'funscript' ? t('Toy.script') : t('Toy.sound')
   if (status.guests.playing) return status.guests.playing.name
   if (status.manual) return patternLabel(status, status.manual.pattern)
-  if (status.script.kind === 'loading') return 'Reading…'
-  return 'Toy'
+  if (status.script.kind === 'loading') return t('Toy.reading')
+  return t('Toy.label')
 }

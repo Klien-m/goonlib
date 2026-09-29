@@ -8,6 +8,7 @@ import type { CoWatchView } from '../state/useCoWatch'
 import type { ToyView } from '../state/useToy'
 import { CoWatchSection, SessionName } from './CoWatchPanel'
 import { TabPanel } from './TabPanel'
+import { t } from '../i18n'
 import type { SheetTab } from './TabPanel'
 
 export interface ToySectionsProps {
@@ -55,8 +56,8 @@ export function ToySections({
             type="button"
             className="banner__close"
             onClick={() => setDismissed(status.message)}
-            aria-label="Dismiss"
-            title="Dismiss"
+            aria-label={t('Toy.dismiss')}
+            title={t('Toy.dismiss')}
           >
             ×
           </button>
@@ -70,11 +71,16 @@ export function ToySections({
         {prefs ? <ConnectionSettings toy={toy} prefs={prefs} /> : null}
         <p className="settings__hint toy__foot">
           {ready
-            ? `Connected through ${status.server === 'external' ? 'Intiface Central' : 'Intiface Engine'}. Press X anywhere to stop.`
+            ? t('Toy.connectedThrough', {
+                name:
+                  status.server === 'external'
+                    ? t('Toy.intifaceCentral')
+                    : t('Toy.intifaceEngine'),
+              })
             : null}
           {ready ? (
             <button type="button" className="button button--quiet" onClick={toy.disconnect}>
-              Disconnect
+              {t('Toy.disconnect')}
             </button>
           ) : null}
         </p>
@@ -94,8 +100,8 @@ export function ToySections({
         <div className="settings__group">
           <SessionName />
           <Switch
-            label="Start where you left off"
-            hint="Opening something in a session starts everyone at your own playback position, rather than at the beginning."
+            label={t('Toy.start')}
+            hint={t('Toy.start.hint')}
             checked={playback.resumeInSessions}
             onChange={(resumeInSessions) => onPlaybackChange({ resumeInSessions })}
           />
@@ -115,14 +121,17 @@ function StopStrip({ toy }: { toy: ToyView }): React.JSX.Element {
     <div className="toy__stop">
       {status.armed ? (
         <button type="button" className="button button--danger toy__big" onClick={toy.stop}>
-          Stop
+          {t('Scan.stop')}
         </button>
       ) : (
         <button type="button" className="button toy__big" onClick={toy.resume}>
-          Stopped - resume
+          {t('Toy.resume')}
         </button>
       )}
-      <div className="toy__meter" aria-label={`Running at ${Math.round(status.level * 100)}%`}>
+      <div
+        className="toy__meter"
+        aria-label={t('Toy.running', { percent: Math.round(status.level * 100) })}
+      >
         <div className="toy__meter-fill" style={{ width: `${status.level * 100}%` }} />
       </div>
       <p className="settings__hint">{describeSource(status)}</p>
@@ -142,23 +151,23 @@ function Devices({ toy }: { toy: ToyView }): React.JSX.Element {
 
   const label =
     status.engine === 'installing'
-      ? 'Downloading Intiface Engine…'
+      ? t('Toy.downloading')
       : status.engine === 'starting'
-        ? 'Connecting…'
+        ? t('Toy.connecting')
         : status.scanning
-          ? 'Scanning…'
-          : 'Scan'
+          ? t('Toy.scanning')
+          : t('Toy.scan')
 
   return (
     <div className="toy__devices">
-      <span className="settings__label">Connected toys</span>
-      <div className="toy__list" role="list" aria-label="Connected toys">
+      <span className="settings__label">{t('Toy.connected')}</span>
+      <div className="toy__list" role="list" aria-label={t('Toy.connected')}>
         {status.devices.length === 0 ? (
           <span className="toy__list-empty">
             {status.scanning
-              ? 'Looking for toys… Switch yours on, and make sure it is not connected to the Lovense app.'
+              ? t('Toy.searching')
               : ready
-                ? 'No toys found.'
+                ? t('Toy.none')
                 : null}
           </span>
         ) : (
@@ -166,7 +175,11 @@ function Devices({ toy }: { toy: ToyView }): React.JSX.Element {
             <div key={device.index} className="toy__device" role="listitem">
               <span className="toy__device-name">{device.name}</span>
               <span className="toy__device-meta">
-                {device.stroke ? 'strokes' : device.vibrate ? 'vibrates' : 'no motors GoonLib drives'}
+                {device.stroke
+                  ? t('Toy.device.strokes')
+                  : device.vibrate
+                    ? t('Toy.device.vibrates')
+                    : t('Toy.device.none')}
                 {device.battery !== null ? ` · ${Math.round(device.battery * 100)}%` : ''}
               </span>
             </div>
@@ -175,7 +188,7 @@ function Devices({ toy }: { toy: ToyView }): React.JSX.Element {
       </div>
 
       {status.engine === 'installing' ? (
-        <div className="player__progress" role="status" aria-label="Downloading Intiface Engine">
+        <div className="player__progress" role="status" aria-label={t('Toy.download.bar')}>
           <div className="player__progress-fill" style={{ width: `${status.progress ?? 0}%` }} />
         </div>
       ) : null}
@@ -189,8 +202,8 @@ function Devices({ toy }: { toy: ToyView }): React.JSX.Element {
       {!ready && !status.installed ? (
         <p className="settings__hint">
           {status.supported
-            ? 'The first time, this downloads Intiface Engine (about 6 MB, from the Buttplug.io project on GitHub) - the program that talks to the toy. If Intiface Central is already running, GoonLib uses that instead.'
-            : 'There is no Intiface Engine download for this machine. Install Intiface Central from intiface.com, start its server, and connect - GoonLib will use it.'}
+            ? t('Toy.firstTime')
+            : t('Toy.unsupported')}
         </p>
       ) : null}
     </div>
@@ -213,15 +226,15 @@ function Strength({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): React.JSX.
   return (
     <div className="settings__section">
       <Switch
-        label="Enable Preview"
-        hint="Lets you preview the toy at the configured intensity"
+        label={t('Toy.preview.enable')}
+        hint={t('Toy.preview.hint')}
         checked={prefs.preview}
         onChange={(preview) => toy.setPrefs({ preview })}
       />
 
       <Slider
-        label="Intensity"
-        hint="The maximum intensity enabled for your toy"
+        label={t('Toy.intensity')}
+        hint={t('Toy.intensity.hint')}
         preview={prefs.preview ? previewToy : undefined}
         min={5}
         max={100}
@@ -233,8 +246,8 @@ function Strength({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): React.JSX.
         onChange={(value) => toy.setPrefs({ maxIntensity: value / 100 })}
       />
       <Slider
-        label="Guest Intensity"
-        hint="The maximum intensity allowed for guests"
+        label={t('Toy.guestIntensity')}
+        hint={t('Toy.guestIntensity.hint')}
         preview={prefs.preview ? previewToy : undefined}
         min={5}
         max={100}
@@ -245,8 +258,8 @@ function Strength({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): React.JSX.
         onChange={(value) => toy.setPrefs({ guestMaxIntensity: value / 100 })}
       />
       <Slider
-        label="Guest Duration"
-        hint="Each guest waits for their own buzz to finish, plus a few seconds, before sending another."
+        label={t('Toy.guestDuration')}
+        hint={t('Toy.guestDuration.hint')}
         min={1}
         max={30}
         step={1}
@@ -255,8 +268,8 @@ function Strength({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): React.JSX.
         onChange={(guestMaxSeconds) => toy.setPrefs({ guestMaxSeconds })}
       />
       <Slider
-        label="Timing"
-        hint="Adjust for bluetooth input lag"
+        label={t('Toy.timing')}
+        hint={t('Toy.timing.hint')}
         min={-500}
         max={1000}
         step={25}
@@ -273,15 +286,15 @@ function ConnectionSettings({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): 
   return (
     <>
       <div className="settings__group">
-        <span className="settings__label">Connecting</span>
+        <span className="settings__label">{t('Toy.connectingGroup')}</span>
         <Switch
-          label="Connect when GoonLib opens"
+          label={t('Toy.connectOnOpen')}
           checked={prefs.autoConnect}
           onChange={(autoConnect) => toy.setPrefs({ autoConnect })}
         />
         <Switch
-          label="Also find toys through the Lovense Connect app"
-          hint="For a toy paired to Lovense Connect on your phone. Lovense's servers are asked where that app is. Takes effect the next time you connect."
+          label={t('Toy.lovenseConnect')}
+          hint={t('Toy.lovenseConnect.hint')}
           checked={prefs.lovenseConnect}
           onChange={(lovenseConnect) => toy.setPrefs({ lovenseConnect })}
         />
@@ -331,11 +344,11 @@ function Patterns({
 
   return (
     <div className="settings__section">
-      <div className="toy__patterns" role="group" aria-label="Pattern">
+      <div className="toy__patterns" role="group" aria-label={t('Pattern.label')}>
         {TOY_PATTERNS.map((pattern) => (
           <PatternChip
             key={pattern.id}
-            label={pattern.label}
+            label={t(pattern.label)}
             glyph={pattern.glyph}
             on={running?.pattern === pattern.id}
             disabled={!ready || !status.armed}
@@ -357,8 +370,8 @@ function Patterns({
                 type="button"
                 className="toy__edit"
                 onClick={() => onEdit(pattern)}
-                aria-label={`Edit ${pattern.name}`}
-                title="Edit"
+                aria-label={t('Toy.editPattern', { name: pattern.name })}
+                title={t('Toy.edit')}
               >
                 ⋯
               </button>
@@ -366,39 +379,37 @@ function Patterns({
           )
         })}
         <button type="button" className="cowatch__provider toy__new" onClick={() => onEdit('new')}>
-          + New
+          + {t('Toy.newPattern')}
         </button>
       </div>
       <p className="settings__hint">
-        {ready
-          ? 'Runs on top of whatever a video is doing - whichever is stronger wins.'
-          : 'Connect a toy under Connections to run these. You can draw and save patterns in the meantime.'}
+        {ready ? t('Toy.overlay.hint') : t('Toy.noToyHint')}
       </p>
     </div>
   )
 }
 
 const STROKE_FEEL: Array<{ id: ToyPrefs['vibrateFrom']; label: string }> = [
-  { id: 'position', label: 'Deeper Strokes' },
-  { id: 'speed', label: 'Faster Strokes' },
+  { id: 'position', label: 'Toy.deeper' },
+  { id: 'speed', label: 'Toy.faster' },
 ]
 
 /** Whether the toy follows what is playing. */
 function SyncSettings({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): React.JSX.Element {
   return (
     <div className="settings__group">
-      <span className="settings__label">Sync</span>
+      <span className="settings__label">{t('Toy.sync')}</span>
 
       <Switch
-        label="Enable Sync"
-        hint="Enables patterns sync"
+        label={t('Toy.sync.enable')}
+        hint={t('Toy.sync.hint')}
         checked={prefs.followVideo}
         onChange={(followVideo) => toy.setPrefs({ followVideo })}
       />
 
       <Switch
-        label="Generate patterns"
-        hint="Generates a waveform pattern based on the audio profile of the video"
+        label={t('Toy.generate')}
+        hint={t('Toy.generate.hint')}
         checked={prefs.audio}
         disabled={!prefs.followVideo}
         onChange={(audio) => toy.setPrefs({ audio })}
@@ -412,11 +423,9 @@ function StrokerSettings({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): Rea
   return (
     <div className="settings__group">
       <div className="settings__field">
-        <span className="settings__label">Stroker</span>
-        <span className="settings__hint">
-          For vibrating toys synced to a stroker script.
-        </span>
-        <div className="cowatch__providers" role="radiogroup" aria-label="Stroker">
+        <span className="settings__label">{t('Toy.stroker')}</span>
+        <span className="settings__hint">{t('Toy.stroker.hint')}</span>
+        <div className="cowatch__providers" role="radiogroup" aria-label={t('Toy.stroker')}>
           {STROKE_FEEL.map((option) => (
             <button
               key={option.id}
@@ -428,13 +437,11 @@ function StrokerSettings({ toy, prefs }: { toy: ToyView; prefs: ToyPrefs }): Rea
               }
               onClick={() => toy.setPrefs({ vibrateFrom: option.id })}
             >
-              {option.label}
+              {t(option.label)}
             </button>
           ))}
         </div>
-        <span className="settings__hint">
-          Whether to prioritise depth vs. speed when synced to a toy vibration pattern.
-        </span>
+        <span className="settings__hint">{t('Toy.stroker.choiceHint')}</span>
       </div>
     </div>
   )
@@ -448,8 +455,8 @@ function Together({ toy, sharing }: { toy: ToyView; sharing: boolean }): React.J
   return (
     <div className="settings__section">
       <Switch
-        label="Guest control"
-        hint="Enables toy control for guests in 'Watch Together' sessions. Controls become visible to guests once enabled."
+        label={t('Toy.guestControl')}
+        hint={t('Toy.guestControl.hint')}
         checked={prefs.guests}
         onChange={(guests) => toy.setPrefs({ guests })}
       />
@@ -467,54 +474,64 @@ function Together({ toy, sharing }: { toy: ToyView; sharing: boolean }): React.J
  */
 function guestState(status: ToyStatus, sharing: boolean): string | null {
   if (status.engine !== 'ready' || status.devices.length === 0) return null
-  if (!status.armed) return 'Stopped - guests are turned away until you resume.'
-  if (!sharing) return 'Ready for when you start a session.'
+  if (!status.armed) return t('Toy.state.stopped')
+  if (!sharing) return t('Toy.state.ready')
   if (status.guests.playing) {
-    const pattern = patternLabel(status, status.guests.playing.pattern).toLowerCase()
-    const queued = status.guests.waiting > 0 ? `, ${status.guests.waiting} more queued` : ''
-    return `${status.guests.playing.name} is sending a ${pattern}${queued}.`
+    const pattern = patternLabel(status, status.guests.playing.pattern)
+    const queued =
+      status.guests.waiting > 0 ? t('Toy.state.moreQueued', { count: status.guests.waiting }) : ''
+    return t('Toy.state.sending', { name: status.guests.playing.name, pattern, queued })
   }
-  return 'Guests can buzz you now.'
+  return t('Toy.state.guests')
 }
 
 /** One line on what is driving the toy right now, if anything. */
 function describeSource(status: ToyStatus): string {
-  if (!status.armed) return 'Nothing will move the toy until you resume.'
+  if (!status.armed) return t('Toy.state.nothing')
 
   const parts: string[] = []
   const script = describeScript(status.script)
   if (script) parts.push(script)
-  if (status.manual) parts.push(`${patternLabel(status, status.manual.pattern)} pattern`)
-  if (status.guests.playing) {
-    const pattern = patternLabel(status, status.guests.playing.pattern)
-    parts.push(`${status.guests.playing.name}'s ${pattern.toLowerCase()}`)
+  if (status.manual) {
+    parts.push(t('Toy.state.pattern', { name: patternLabel(status, status.manual.pattern) }))
   }
-  if (status.guests.waiting > 0) parts.push(`${status.guests.waiting} buzz queued`)
+  if (status.guests.playing) {
+    parts.push(
+      t('Toy.state.guestPattern', {
+        name: status.guests.playing.name,
+        pattern: patternLabel(status, status.guests.playing.pattern),
+      }),
+    )
+  }
+  if (status.guests.waiting > 0) {
+    parts.push(t('Toy.state.buzzQueued', { count: status.guests.waiting }))
+  }
 
-  return parts.length > 0 ? parts.join(' · ') : 'Waiting for a video, a pattern, or a guest.'
+  return parts.length > 0 ? parts.join(' · ') : t('Toy.state.waiting')
 }
 
 export function describeScript(script: ToyScriptState): string | null {
   switch (script.kind) {
     case 'funscript':
-      return `Playing ${script.name}`
+      return t('Toy.state.playing', { name: script.name })
     case 'audio':
-      return 'Following the sound'
+      return t('Toy.state.sound')
     case 'loading':
-      return 'Reading the video…'
+      return t('Toy.state.reading')
     case 'error':
-      return `Script unreadable: ${script.message}`
+      return t('Toy.state.unreadable', { reason: script.message })
     case 'none':
-      return script.mediaId !== null ? 'This video has no script' : null
+      return script.mediaId !== null ? t('Toy.state.noScript') : null
   }
 }
 
 /** What to call a pattern, whether built in, saved, or still being drawn. */
 export function patternLabel(status: ToyStatus, pattern: PatternId | 'preview'): string {
-  if (pattern === 'preview') return 'Preview'
+  if (pattern === 'preview') return t('Toy.preview')
   const id = customIdOf(pattern)
-  if (id !== null) return status.patterns.find((saved) => saved.id === id)?.name ?? 'Saved'
-  return TOY_PATTERNS.find((known) => known.id === pattern)?.label ?? pattern
+  if (id !== null) return status.patterns.find((saved) => saved.id === id)?.name ?? t('Toy.saved')
+  const known = TOY_PATTERNS.find((entry) => entry.id === pattern)
+  return known ? t(known.label) : pattern
 }
 
 function PatternChip(props: {
@@ -531,7 +548,7 @@ function PatternChip(props: {
       aria-pressed={props.on}
       disabled={props.disabled}
       onClick={props.onToggle}
-      title={props.on ? 'Stop this pattern' : undefined}
+      title={props.on ? t('Toy.stopPattern') : undefined}
     >
       <span aria-hidden="true">{props.glyph}</span> {props.label}
     </button>
