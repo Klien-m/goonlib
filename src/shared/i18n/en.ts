@@ -585,6 +585,8 @@ export const en: Catalogue = {
   'Dupes.none': 'No duplicates found',
   'Dupes.none.pending':
     '{count} items haven’t been fingerprinted yet, so this isn’t the whole picture. Run a scan to finish.',
+  'Dupes.none.outdated':
+    '{count} films were fingerprinted before this version, so this isn’t the whole picture. Run a scan to read them again.',
   'Dupes.none.distinct': 'Every file in the library is distinct.',
   'Dupes.rescan': 'Re-scan',
   'Dupes.rescan.title': 'Look for duplicates again, for anything added or removed since',
@@ -592,6 +594,9 @@ export const en: Catalogue = {
   'Dupes.found': '{count} duplicates found',
   'Dupes.reclaimable': '{size} reclaimable',
   'Dupes.pending': '{count} not yet fingerprinted',
+  'Dupes.outdated': '{count} to re-read',
+  'Dupes.outdated.title':
+    'Films added before this version were read from end to end. The next scan fingerprints them from their ends instead, which is quick but not instant.',
   'Dupes.selected': '{count} selected',
   'Dupes.spared': '{count} favourites preserved',
   'Dupes.spared.title':
@@ -604,6 +609,9 @@ export const en: Catalogue = {
   'Dupes.moving': 'Moving…',
   'Dupes.move.title': 'Moves the selected files to the system Trash after confirmation',
   'Dupes.identical': 'identical',
+  'Dupes.sampled': 'ends match',
+  'Dupes.sampled.title':
+    'These are large files, so they were fingerprinted from their length and their first and last 8MB rather than read whole. Identical files always match this way, but two different files could too — which is why it says ends match rather than identical.',
   'Dupes.similar': 'similar · {distance} bits',
   'Dupes.copies': '{count} copies · {size} reclaimable',
   'Dupes.allButLargest': 'Select all but the largest',

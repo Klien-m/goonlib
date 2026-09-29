@@ -1571,6 +1571,13 @@ body {
   color: var(--warn-text-soft);
 }
 
+/* "ends match" on a group of big files, next to the "identical" tag. */
+.dupes__sampled {
+  color: var(--warn-text-soft);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .dupes__list {
   display: flex;
   flex-direction: column;

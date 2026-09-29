@@ -8,6 +8,7 @@ import type {
   SpriteLayout,
   StageState,
 } from '@shared/types'
+import { SAMPLE_ABOVE_BYTES, SAMPLE_PREFIX } from '../scan/fingerprint'
 import type { ProbeResult } from '../scan/probe'
 import { escapeLike } from './folders'
 import { DURATION_BANDS, SIZE_BANDS } from '@shared/types'
@@ -203,6 +204,7 @@ export interface PendingItem {
   relPath: string
   ext: string
   kind: MediaKind
+  size: number
   durationMs: number | null
 }
 
@@ -235,9 +237,17 @@ export function claimPending(stage: StageColumn, limit: number, kind?: MediaKind
   const rows = getDb()
     .prepare<
       unknown[],
-      { id: number; root_path: string; rel_path: string; ext: string; kind: MediaKind; duration_ms: number | null }
+      {
+        id: number
+        root_path: string
+        rel_path: string
+        ext: string
+        kind: MediaKind
+        size: number
+        duration_ms: number | null
+      }
     >(
-      `SELECT m.id, r.path AS root_path, m.rel_path, m.ext, m.kind, m.duration_ms
+      `SELECT m.id, r.path AS root_path, m.rel_path, m.ext, m.kind, m.size, m.duration_ms
          FROM media m
          JOIN roots r ON r.id = m.root_id
         WHERE m.${stage} = 'pending' AND m.missing = 0 AND r.enabled = 1
@@ -253,6 +263,7 @@ export function claimPending(stage: StageColumn, limit: number, kind?: MediaKind
     relPath: row.rel_path,
     ext: row.ext,
     kind: row.kind,
+    size: row.size,
     durationMs: row.duration_ms,
   }))
 }
@@ -301,13 +312,57 @@ export function markPresent(id: number): void {
   getDb().prepare('UPDATE media SET missing = 0 WHERE id = ?').run(id)
 }
 
+/**
+ * Queues the files whose stored fingerprint no longer matches how they'd be
+ * hashed today, and nothing else.
+ *
+ * Without this, a library scanned before sampling existed keeps its whole-file
+ * digests for films: correct, but it means the read this change exists to avoid
+ * has already happened, and stays happened. Doing it per row rather than as an
+ * UPDATE over the table is what keeps a second scan free — once every film
+ * carries a sampled digest, this selects nothing.
+ *
+ * Small files that were sampled under an older threshold would be picked up too,
+ * if the threshold ever moves down. On the way up (which is the change that
+ * shipped) it is films only.
+ */
+export function queueOutdatedFingerprints(): number {
+  const result = getDb()
+    .prepare(
+      `UPDATE media SET hash_state = 'pending'
+        WHERE hash_state = 'done'
+          AND content_hash IS NOT NULL
+          AND content_sampled <> (CASE WHEN size >= ? THEN 1 ELSE 0 END)`,
+    )
+    .run(SAMPLE_ABOVE_BYTES)
+
+  return result.changes
+}
+
 export function applyHashResult(
   id: number,
-  result: { contentHash: string; phash: string | null },
+  result: { contentHash: string; sampled: boolean; phash: string | null },
 ): void {
+  // The scheme lives in its own column, not in the hash string. `content_hash`
+  // stays a bare digest, which is what the exact-dupe query groups on and what
+  // the duplicates screen compares — only when deciding whether to call a group
+  // "identical" does it matter whether the digests covered the whole file.
+  //
+  // Both spellings are accepted so the one place that writes this row is also
+  // the one place that knows the format; a caller handing over the tagged value
+  // straight from the scan gets the same stored result as one handing over the
+  // bare digest.
+  const bare = result.contentHash.startsWith(SAMPLE_PREFIX)
+    ? result.contentHash.slice(SAMPLE_PREFIX.length)
+    : result.contentHash
+
   getDb()
-    .prepare("UPDATE media SET content_hash = ?, phash = ?, hash_state = 'done' WHERE id = ?")
-    .run(result.contentHash, result.phash, id)
+    .prepare(
+      `UPDATE media SET
+         content_hash = ?, content_sampled = ?, phash = ?, hash_state = 'done'
+       WHERE id = ?`,
+    )
+    .run(bare, result.sampled ? 1 : 0, result.phash, id)
 }
 
 export function applySpriteResult(id: number, layout: SpriteLayout | null): void {

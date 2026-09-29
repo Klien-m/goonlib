@@ -3,33 +3,25 @@
  *
  * Two hashes per item:
  *
- *  - `contentHash` is a straight SHA-256 of the whole file, streamed. It answers
- *    "byte-for-byte identical" with no false positives. An earlier plan used a
- *    size + head/tail "quick hash" to avoid reading large files, but SHA-256 runs
- *    at gigabytes per second on this hardware, and a scheme that can report two
- *    different files as duplicates is a bad trade when the UI offers to delete
- *    things.
+ *  - `contentHash` answers "identical file". For everything under a gigabyte it
+ *    is a straight SHA-256 of the whole file, streamed, with no false positives.
+ *    For a film it is a SHA-256 of the file's length and its first and last 8MB
+ *    instead — the trade and its one caveat are argued in fingerprint.ts, which
+ *    is where the decision lives. Either way the value says which it is.
  *
  *  - `phash` is perceptual, computed from the thumbnail we already generated, and
  *    catches re-encodes and rescales that a content hash cannot.
  */
 
-import { createHash } from 'node:crypto'
-import { createReadStream } from 'node:fs'
-import { pipeline } from 'node:stream/promises'
 import sharp from 'sharp'
+import { fingerprintFile } from './fingerprint'
 import { HASH_SIZE, perceptualHash } from './phash'
 
 export interface HashResult {
   contentHash: string
+  /** True when contentHash covers the file's ends rather than all of it. */
+  sampled: boolean
   phash: string | null
-}
-
-/** Streams the file through SHA-256 without holding it in memory. */
-export async function hashFileContents(absPath: string, signal?: AbortSignal): Promise<string> {
-  const digest = createHash('sha256')
-  await pipeline(createReadStream(absPath), digest, { signal })
-  return digest.digest('hex')
 }
 
 /**
@@ -58,10 +50,11 @@ export async function hashThumbnail(thumbPath: string): Promise<string | null> {
  */
 export async function hashItem(
   absPath: string,
+  size: number,
   thumbPath: string | null,
   signal?: AbortSignal,
 ): Promise<HashResult> {
-  const contentHash = await hashFileContents(absPath, signal)
+  const { hash: contentHash, sampled } = await fingerprintFile(absPath, size, signal)
 
   let phash: string | null = null
   if (thumbPath) {
@@ -72,5 +65,5 @@ export async function hashItem(
     }
   }
 
-  return { contentHash, phash }
+  return { contentHash, sampled, phash }
 }

@@ -22,6 +22,7 @@ function group(
     key,
     kind: 'exact',
     distance: 0,
+    sampled: false,
     items: [...items]
       .sort((a, b) => b[1] - a[1])
       .map(

@@ -54,6 +54,17 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
     [report],
   )
 
+  // What the library is missing to make this report complete. Counted together
+  // because the sentence is about the same thing either way: some files have no
+  // fingerprint yet, or one from before films stopped being read whole.
+  const gap = useMemo(
+    () => ({
+      pending: report?.pending.pending ?? 0,
+      outdated: report?.pending.outdated ?? 0,
+    }),
+    [report],
+  )
+
   const selectedBytes = useMemo(() => {
     // One file can legitimately appear in more than one group — an exact copy of
     // one thing and a near-copy of another — but it only frees its bytes once.
@@ -116,9 +127,11 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
       <div className="empty">
         <h2 className="empty__title">{t('Dupes.none')}</h2>
         <p className="empty__body">
-          {report && report.pending > 0
-            ? t('Dupes.none.pending', { count: formatCount(report.pending) })
-            : t('Dupes.none.distinct')}
+          {gap.pending > 0
+            ? t('Dupes.none.pending', { count: formatCount(gap.pending) })
+            : gap.outdated > 0
+              ? t('Dupes.none.outdated', { count: formatCount(gap.outdated) })
+              : t('Dupes.none.distinct')}
         </p>
         <button type="button" className="button" onClick={() => void load()}>
           {t('Dupes.rescan')}
@@ -155,9 +168,15 @@ export function Duplicates({ onChanged }: DuplicatesProps): React.JSX.Element {
           </span>
         </div>
 
-        {report && report.pending > 0 ? (
+        {gap.pending > 0 ? (
           <span className="dupes__warn">
-            {t('Dupes.pending', { count: formatCount(report.pending) })}
+            {t('Dupes.pending', { count: formatCount(gap.pending) })}
+          </span>
+        ) : null}
+
+        {gap.outdated > 0 ? (
+          <span className="dupes__warn" title={t('Dupes.outdated.title')}>
+            {t('Dupes.outdated', { count: formatCount(gap.outdated) })}
           </span>
         ) : null}
 
@@ -262,6 +281,14 @@ function Group({
             ? t('Dupes.identical')
             : t('Dupes.similar', { distance: group.distance })}
         </span>
+        {group.sampled ? (
+          // These are films, so the group is also the largest thing on the
+          // screen — worth saying that "identical" here means the ends matched
+          // rather than every byte.
+          <span className="dupes__sampled" title={t('Dupes.sampled.title')}>
+            {t('Dupes.sampled')}
+          </span>
+        ) : null}
         <span className="muted">
           {t('Dupes.copies', { count: group.items.length, size: formatBytes(group.reclaimable) })}
         </span>
