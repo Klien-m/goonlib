@@ -20,7 +20,7 @@ import { Duplicates } from './components/Duplicates'
 import { Lightbox } from './components/Lightbox'
 import { MediaGrid } from './components/MediaGrid'
 import { actionOf } from './keys'
-import { IS_WINDOWS, TRASH_NAME } from './platform'
+import { IS_WINDOWS, TRASH_NAME_KEY } from './platform'
 import { setScanSound } from './sounds'
 import { ContinueRow } from './components/ContinueRow'
 import { CoWatchCard } from './components/CoWatchCard'
@@ -1476,8 +1476,8 @@ function trashNotice(undo: boolean, result: TrashUndoResult): string {
     return undo ? t('Notice.nothingUndo') : t('Notice.nothingRedo')
   }
   const done = undo
-    ? t('Notice.putBack', { files: files(result.moved), trash: TRASH_NAME })
-    : t('Notice.trashedAgain', { files: files(result.moved), trash: TRASH_NAME })
+    ? t('Notice.putBack', { files: files(result.moved), trash: t(TRASH_NAME_KEY) })
+    : t('Notice.trashedAgain', { files: files(result.moved), trash: t(TRASH_NAME_KEY) })
   if (result.failed === 0) return done
   // Windows never reports where the Recycle Bin put a file, so undo cannot find
   // it again. Saying it is gone or replaced would be wrong: it is right there,
@@ -1485,8 +1485,8 @@ function trashNotice(undo: boolean, result: TrashUndoResult): string {
   const missed = !undo
     ? t('Notice.couldNotTrashAgain', { files: files(result.failed) })
     : IS_WINDOWS
-      ? t('Notice.stayedInTrash', { files: files(result.failed), trash: TRASH_NAME })
-      : t('Notice.couldNotPutBack', { files: files(result.failed), trash: TRASH_NAME })
+      ? t('Notice.stayedInTrash', { files: files(result.failed), trash: t(TRASH_NAME_KEY) })
+      : t('Notice.couldNotPutBack', { files: files(result.failed), trash: t(TRASH_NAME_KEY) })
   return result.moved > 0 ? `${done}. ${missed}.` : missed
 }
 

@@ -7,12 +7,25 @@ import type { Catalogue } from './index'
  * 不留空格——中英混排时那个空格是英文的排版习惯,不是中文的。
  *
  * 专有名词保持原文:Lovense、Intiface、cloudflared、ngrok、GoonLib 都是
- * 产品名;Recycle Bin 之类由平台决定的词,原文里也是占位符,跟着一起翻。
+ * 产品名;由平台决定的叫法(文件管理器、废纸篓)按 `Platform.*` 那几条翻,
+ * 词条里的 {trash} 由调用方填进去——见 shared/platform.ts。
  */
 export const zh: Catalogue = {
   // --- languages -----------------------------------------------------------------
   'Language.name': '语言',
   'Language.hint': '界面使用哪种语言。切换后立即生效。',
+
+  // --- 各平台的叫法 ---------------------------------------------------------------
+  //
+  // 用哪一个由平台决定,说什么由语言决定——见 shared/platform.ts。
+  // 词条里别处的 {trash} 就是下面这两个里的一个,由写句子的那方填进去。
+  'Platform.reveal.mac': '在访达中显示',
+  'Platform.reveal.windows': '在资源管理器中显示',
+  'Platform.reveal.linux': '在文件管理器中显示',
+  'Platform.revealShort.mac': '显示',
+  'Platform.revealShort.other': '显示',
+  'Platform.trash.other': '废纸篓',
+  'Platform.trash.windows': '回收站',
 
   // --- settings sheet ------------------------------------------------------------
   'Settings.title': '设置',
@@ -199,9 +212,9 @@ export const zh: Catalogue = {
   'Appearance.saved': '已把“{name}”保存为你的{side}主题。',
   'Appearance.reset': '重置{label}',
   'Appearance.reset.title': '回到跟随基础配色',
-  'Appearance.remove': '移到废纸篓',
-  'Appearance.remove.title': '把这个主题的文件移到废纸篓。如果正在使用,会一直用到你换另一个为止。',
-  'Appearance.removed': '已把“{name}”移到废纸篓。',
+  'Appearance.remove': '移到{trash}',
+  'Appearance.remove.title': '把这个主题的文件移到{trash}。如果正在使用,会一直用到你换另一个为止。',
+  'Appearance.removed': '已把“{name}”移到{trash}。',
   'Appearance.import': '导入主题…',
   'Appearance.imported': '已导入“{name}”。保存后即可使用。',
   'Appearance.imported.skipped': '已导入“{name}”,跳过了 {skipped}。',
@@ -560,9 +573,9 @@ export const zh: Catalogue = {
   'Folder.holds': '{name}里有 {count} 项。',
   'Folder.holds.one': '{name}里有 1 项。',
   'Folder.trash.note.source':
-    '文件夹会移到废纸篓,该来源也会从媒体库移除。这一步在这里没法撤销——需要的话去废纸篓找。',
-  'Folder.trash.note': '文件夹和它下面的所有内容都会移到废纸篓。Ctrl+Z 可以放回来。',
-  'Folder.trash': '移到废纸篓',
+    '文件夹会移到{trash},该来源也会从媒体库移除。这一步在这里没法撤销——需要的话去{trash}找。',
+  'Folder.trash.note': '文件夹和它下面的所有内容都会移到{trash}。Ctrl+Z 可以放回来。',
+  'Folder.trash': '移到{trash}',
   'Folder.expand': '展开',
   'Folder.collapse': '收起',
   'Folder.expandName': '展开 {name}',
@@ -594,7 +607,7 @@ export const zh: Catalogue = {
   'Dupes.clear': '取消选择',
   'Dupes.move': '把选中项移到{trash}',
   'Dupes.moving': '移动中…',
-  'Dupes.move.title': '确认后把选中的文件移到系统废纸篓',
+  'Dupes.move.title': '确认后把选中的文件移到系统{trash}',
   'Dupes.identical': '完全相同',
   'Dupes.sampled': '首尾一致',
   'Dupes.sampled.title':
@@ -908,14 +921,14 @@ export const zh: Catalogue = {
   'Keys.library.kindImages': '只看图片',
   'Keys.library.kindVideos': '只看视频',
   'Keys.library.selectAll': '全选',
-  'Keys.library.trash': '把选中项移到废纸篓',
+  'Keys.library.trash': '把选中项移到{trash}',
   'Keys.library.undo': '撤销删除',
   'Keys.library.redo': '重做删除',
   'Keys.viewer.close': '关闭查看器',
   'Keys.viewer.next': '下一个',
   'Keys.viewer.previous': '上一个',
   'Keys.viewer.favorite': '收藏',
-  'Keys.viewer.trash': '移到废纸篓',
+  'Keys.viewer.trash': '移到{trash}',
   'Keys.viewer.shuffle': '开启或关闭随机',
   'Keys.viewer.random': '随机打开一个',
   'Keys.viewer.loop': '循环这一条',

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { describeBinding, KEY_ACTIONS } from '@shared/keys'
 import { useBindings } from '../keys'
-import { IS_MAC, withTrashName } from '../platform'
+import { IS_MAC, TRASH_NAME_KEY } from '../platform'
 import { t } from '../i18n'
 
 /**
@@ -47,7 +47,7 @@ export function ShortcutsCard({ onClose }: { onClose: () => void }): React.JSX.E
               <dl className="shortcuts__list">
                 {KEY_ACTIONS.filter((action) => action.group === group).map((action) => (
                   <div key={action.id} className="shortcuts__row">
-                    <dt>{withTrashName(t(action.label))}</dt>
+                    <dt>{t(action.label, { trash: t(TRASH_NAME_KEY) })}</dt>
                     <dd>
                       {(bindings[action.id] ?? []).length === 0 ? (
                         <span className="muted">{t('Shortcuts.card.unset')}</span>
