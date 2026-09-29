@@ -5,15 +5,15 @@
  * the strip of window the macOS traffic lights sit in, the name of the file
  * manager and the Trash, and the name of the modifier key. The platform comes
  * across the bridge as a plain value rather than being asked for at the moment
- * it is needed, and the words themselves live in shared/platform.ts.
+ * it is needed, and which words go with it is worked out in shared/platform.ts -
+ * as catalogue keys, since the words are translated.
  */
 
 import {
   cloudflaredInstall,
-  revealLabel,
-  revealShort,
-  trashName,
-  withTrashName as nameTheTrash,
+  revealLabelKey,
+  revealShortKey,
+  trashNameKey,
 } from '@shared/platform'
 import type { Platform } from '@shared/types'
 
@@ -22,15 +22,18 @@ export const PLATFORM: Platform = window.goonlib?.app?.platform ?? 'darwin'
 export const IS_MAC = PLATFORM === 'darwin'
 export const IS_WINDOWS = PLATFORM === 'win32'
 
-export const REVEAL_LABEL = revealLabel(PLATFORM)
-export const REVEAL_SHORT = revealShort(PLATFORM)
-export const TRASH_NAME = trashName(PLATFORM)
-export const CLOUDFLARED_INSTALL = cloudflaredInstall(PLATFORM)
+/**
+ * The names this platform gives things, as catalogue keys rather than words.
+ *
+ * Kept as keys so that `t()` can fill the one currently showing: these are
+ * interface text, and a platform name is no reason for a line to be the only
+ * English one on a Chinese screen.
+ */
+export const REVEAL_LABEL_KEY = revealLabelKey(PLATFORM)
+export const REVEAL_SHORT_KEY = revealShortKey(PLATFORM)
+export const TRASH_NAME_KEY = trashNameKey(PLATFORM)
 
-/** Text written with the Trash in it, named the way this platform names it. */
-export function withTrashName(text: string): string {
-  return nameTheTrash(text, PLATFORM)
-}
+export const CLOUDFLARED_INSTALL = cloudflaredInstall(PLATFORM)
 
 /**
  * Measures a scrollbar once and publishes it as `--scrollbar`.

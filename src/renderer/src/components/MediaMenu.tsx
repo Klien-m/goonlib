@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Collection, MediaFileAction, MediaItem, Root, Tag } from '@shared/types'
-import { IS_MAC, REVEAL_LABEL, TRASH_NAME } from '../platform'
+import { IS_MAC, REVEAL_LABEL_KEY, TRASH_NAME_KEY } from '../platform'
 import { FolderPicker } from './FolderPicker'
 import { AddToCollection } from './AddToCollection'
 import { t } from '../i18n'
@@ -297,7 +297,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
       </button>
 
       <button type="button" className="mediamenu__item" role="menuitem" onClick={() => act('reveal')}>
-        {REVEAL_LABEL}
+        {t(REVEAL_LABEL_KEY)}
       </button>
 
       <div className="mediamenu__rule" role="separator" />
@@ -308,7 +308,7 @@ export function MediaMenu(props: MediaMenuProps): React.JSX.Element | null {
         role="menuitem"
         onClick={() => act('trash')}
       >
-        {t('Menu.trash', { trash: TRASH_NAME })}
+        {t('Menu.trash', { trash: t(TRASH_NAME_KEY) })}
       </button>
     </div>
   )

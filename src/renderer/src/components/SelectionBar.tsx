@@ -4,7 +4,7 @@ import { AddToCollection } from './AddToCollection'
 import { HeartIcon } from './Toolbar'
 import { MoveIcon, TrashIcon } from './SidebarIcons'
 import { formatCount } from '../format'
-import { TRASH_NAME } from '../platform'
+import { TRASH_NAME_KEY } from '../platform'
 import type { Selection } from '../state/useSelection'
 import { t } from '../i18n'
 
@@ -174,7 +174,7 @@ export function SelectionBar({
         className="icon-button icon-button--danger"
         disabled={busy || selection.size === 0}
         onClick={onTrash}
-        title={t('Selection.trash.title', { trash: TRASH_NAME })}
+        title={t('Selection.trash.title', { trash: t(TRASH_NAME_KEY) })}
       >
         <TrashIcon />
       </button>

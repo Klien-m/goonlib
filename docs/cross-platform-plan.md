@@ -32,10 +32,12 @@ paint, so the stylesheet can lay the chrome out for it.
   default, which is where its About panel and Cmd+C live.
 - **Wording.** "Reveal in Finder" reads "Show in Explorer" or "Show in file manager";
   the Trash is the Recycle Bin on Windows, in the menus, the selection bar, the
-  duplicates page and the shortcuts list; "Copy" is hidden off macOS, where it would be
-  a second name for "Copy File Path"; the cloudflared install command is the one for
-  this platform, and Linux is told to find it rather than given a command that is wrong
-  on most distributions.
+  duplicates page and the shortcuts list. Both are catalogue entries under `Platform.*`
+  chosen by platform and said in the language on screen, so a platform name is no
+  longer the one line left in English on a translated screen; "Copy" is hidden off
+  macOS, where it would be a second name for "Copy File Path"; the cloudflared install
+  command is the one for this platform, and Linux is told to find it rather than given
+  a command that is wrong on most distributions.
 - **Fonts.** The stack already named Segoe UI and system-ui. Left as it is.
 
 ## 2. Build on each platform - done

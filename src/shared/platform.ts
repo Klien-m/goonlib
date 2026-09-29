@@ -6,35 +6,30 @@
  * has to match whichever machine the window is on. Keeping the words here, as
  * functions of a platform rather than of the machine this process happens to be
  * running on, means both sides can use them and both can be tested.
+ *
+ * What they return is a catalogue key rather than the words themselves: the
+ * names are part of the interface, so they are translated like everything else,
+ * and a `{place}` is what says which platform's name to put in it. The key is
+ * picked by platform, the sentence by language.
  */
 
 import type { Platform } from './types'
 
 /** What "show me this file" is called. */
-export function revealLabel(platform: Platform): string {
-  if (platform === 'darwin') return 'Reveal in Finder'
-  if (platform === 'win32') return 'Show in Explorer'
-  return 'Show in file manager'
+export function revealLabelKey(platform: Platform): string {
+  if (platform === 'darwin') return 'Platform.reveal.mac'
+  if (platform === 'win32') return 'Platform.reveal.windows'
+  return 'Platform.reveal.linux'
 }
 
 /** The short version, for a button with no room for the rest. */
-export function revealShort(platform: Platform): string {
-  return platform === 'darwin' ? 'Reveal' : 'Show'
+export function revealShortKey(platform: Platform): string {
+  return platform === 'darwin' ? 'Platform.revealShort.mac' : 'Platform.revealShort.other'
 }
 
 /** Where a deleted file goes, by name. */
-export function trashName(platform: Platform): string {
-  return platform === 'win32' ? 'Recycle Bin' : 'Trash'
-}
-
-/**
- * Display text written with the macOS name in it, with the Trash called what it
- * is called here. Cheaper than keeping two copies of every string that mentions
- * it, and the word only appears in the one sense anywhere in the app.
- */
-export function withTrashName(text: string, platform: Platform): string {
-  const name = trashName(platform)
-  return name === 'Trash' ? text : text.replaceAll('Trash', name)
+export function trashNameKey(platform: Platform): string {
+  return platform === 'win32' ? 'Platform.trash.windows' : 'Platform.trash.other'
 }
 
 /**

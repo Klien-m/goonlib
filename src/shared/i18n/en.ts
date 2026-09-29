@@ -18,6 +18,19 @@ export const en: Catalogue = {
   'Language.name': 'Language',
   'Language.hint': 'Which language the app is written in. Takes effect at once.',
 
+  // --- what each platform calls things -------------------------------------------
+  //
+  // The platform decides which of these is used, the language decides what it
+  // says - see shared/platform.ts. A `{trash}` elsewhere in the catalogue is one
+  // of the two below, filled in by whoever is writing the sentence.
+  'Platform.reveal.mac': 'Reveal in Finder',
+  'Platform.reveal.windows': 'Show in Explorer',
+  'Platform.reveal.linux': 'Show in file manager',
+  'Platform.revealShort.mac': 'Reveal',
+  'Platform.revealShort.other': 'Show',
+  'Platform.trash.other': 'Trash',
+  'Platform.trash.windows': 'Recycle Bin',
+
   // --- settings sheet ------------------------------------------------------------
   'Settings.title': 'Settings',
   'Settings.close': 'Close settings',
@@ -209,10 +222,10 @@ export const en: Catalogue = {
   'Appearance.saved': 'Saved “{name}” as your {side} theme.',
   'Appearance.reset': 'Reset {label}',
   'Appearance.reset.title': 'Go back to following the base colours',
-  'Appearance.remove': 'Move to Trash',
+  'Appearance.remove': 'Move to {trash}',
   'Appearance.remove.title':
-    "Move this theme's file to the Trash. If it is in use, it stays in use until you pick another.",
-  'Appearance.removed': 'Moved “{name}” to the Trash.',
+    "Move this theme's file to the {trash}. If it is in use, it stays in use until you pick another.",
+  'Appearance.removed': 'Moved “{name}” to the {trash}.',
   'Appearance.import': 'Import theme…',
   'Appearance.imported': 'Imported “{name}”. Save to use it.',
   'Appearance.imported.skipped': 'Imported “{name}”, skipping {skipped}.',
@@ -571,9 +584,9 @@ export const en: Catalogue = {
   'Folder.holds': '{name} holds {count} items.',
   'Folder.holds.one': '{name} holds 1 item.',
   'Folder.trash.note.source':
-    'The folder goes to the Trash and the source is removed from the library. This one cannot be undone from here - the folder is in the Trash if you need it back.',
-  'Folder.trash.note': 'The folder and everything under it go to the Trash. Ctrl+Z puts it back.',
-  'Folder.trash': 'Move to Trash',
+    'The folder goes to the {trash} and the source is removed from the library. This one cannot be undone from here - the folder is in the {trash} if you need it back.',
+  'Folder.trash.note': 'The folder and everything under it go to the {trash}. Ctrl+Z puts it back.',
+  'Folder.trash': 'Move to {trash}',
   'Folder.expand': 'Expand',
   'Folder.collapse': 'Collapse',
   'Folder.expandName': 'Expand {name}',
@@ -607,7 +620,7 @@ export const en: Catalogue = {
   'Dupes.clear': 'Clear',
   'Dupes.move': 'Move selected to {trash}',
   'Dupes.moving': 'Moving…',
-  'Dupes.move.title': 'Moves the selected files to the system Trash after confirmation',
+  'Dupes.move.title': 'Moves the selected files to the system {trash} after confirmation',
   'Dupes.identical': 'identical',
   'Dupes.sampled': 'ends match',
   'Dupes.sampled.title':
@@ -931,14 +944,14 @@ export const en: Catalogue = {
   'Keys.library.kindImages': 'Show images only',
   'Keys.library.kindVideos': 'Show videos only',
   'Keys.library.selectAll': 'Select everything',
-  'Keys.library.trash': 'Move selection to Trash',
+  'Keys.library.trash': 'Move selection to {trash}',
   'Keys.library.undo': 'Undo a delete',
   'Keys.library.redo': 'Redo a delete',
   'Keys.viewer.close': 'Close the viewer',
   'Keys.viewer.next': 'Next item',
   'Keys.viewer.previous': 'Previous item',
   'Keys.viewer.favorite': 'Favorite',
-  'Keys.viewer.trash': 'Move to Trash',
+  'Keys.viewer.trash': 'Move to {trash}',
   'Keys.viewer.shuffle': 'Shuffle on or off',
   'Keys.viewer.random': 'Open something at random',
   'Keys.viewer.loop': 'Loop this item',

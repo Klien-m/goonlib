@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { clashesWith, describeBinding, KEY_ACTIONS, bindingFromEvent } from '@shared/keys'
 import { accept, useBindings } from '../keys'
-import { IS_MAC, withTrashName } from '../platform'
+import { IS_MAC, TRASH_NAME_KEY } from '../platform'
 import { t } from '../i18n'
 
 /**
@@ -41,7 +41,7 @@ export function ShortcutsSettings(): React.JSX.Element {
         setProblem(
           t('Shortcuts.taken', {
             binding: describeBinding(pressed, IS_MAC),
-            other: withTrashName(t(other?.label ?? clashes[0] ?? '')),
+            other: t(other?.label ?? clashes[0] ?? '', { trash: t(TRASH_NAME_KEY) }),
           }),
         )
         setRecording(null)
@@ -83,7 +83,7 @@ export function ShortcutsSettings(): React.JSX.Element {
           <span className="settings__label">{t(group)}</span>
           {KEY_ACTIONS.filter((action) => action.group === group).map((action) => (
             <div key={action.id} className="shortcuts__setting">
-              <span className="shortcuts__label">{withTrashName(t(action.label))}</span>
+              <span className="shortcuts__label">{t(action.label, { trash: t(TRASH_NAME_KEY) })}</span>
               <button
                 type="button"
                 className={recording === action.id ? 'button button--on' : 'button button--quiet'}
@@ -104,7 +104,7 @@ export function ShortcutsSettings(): React.JSX.Element {
                 className="styling__reset"
                 onClick={() => void window.goonlib.keys.set(action.id, []).then(accept).catch(() => undefined)}
                 title={t('Shortcuts.clear')}
-                aria-label={t('Shortcuts.clearAria', { label: withTrashName(t(action.label)) })}
+                aria-label={t('Shortcuts.clearAria', { label: t(action.label, { trash: t(TRASH_NAME_KEY) }) })}
               >
                 ×
               </button>
