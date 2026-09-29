@@ -291,6 +291,16 @@ export interface DuplicateGroup {
   kind: 'exact' | 'near'
   /** Hamming distance threshold that produced a near group; 0 for exact. */
   distance: number
+  /**
+   * Grouped on a fingerprint taken from the ends of a film rather than the whole
+   * of it.
+   *
+   * Not a detail to swallow: these are the largest files in the library, so this
+   * is where the space is, and it is also where "identical" is a claim about a
+   * gigabyte rather than a guarantee. The UI says which groups these are, since
+   * it is offering to delete things.
+   */
+  sampled: boolean
   /** Members, largest file first. */
   items: MediaItem[]
   /** Bytes freed by keeping exactly one member. */
@@ -300,8 +310,19 @@ export interface DuplicateGroup {
 export interface DuplicateReport {
   exact: DuplicateGroup[]
   near: DuplicateGroup[]
-  /** Items still awaiting a hash, so the UI can say the picture is incomplete. */
+  /**
+   * Items still awaiting a hash, so the UI can say the picture is incomplete.
+   *
+   * Two counts, because they mean different things: `pending` never got a
+   * fingerprint, and `outdated` has one from before the current scheme and will
+   * be re-read by the next scan.
+   */
+  pending: DuplicateFingerprintGap
+}
+
+export interface DuplicateFingerprintGap {
   pending: number
+  outdated: number
 }
 
 /** A kept frame: the new item, or why there isn't one. */

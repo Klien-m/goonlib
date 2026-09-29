@@ -25,6 +25,7 @@ import {
   countPending,
   deleteMedia,
   missingMediaIds,
+  queueOutdatedFingerprints,
   setStageState,
   upsertMediaBatch,
 } from '../db/media'
@@ -272,8 +273,17 @@ export class Indexer extends EventEmitter {
     }
 
     this.setPhase('hashing')
+
+    // Files fingerprinted before sampling existed are re-read once, at the size
+    // the current scheme would use. Doing it here rather than as a migration
+    // keeps it a query over rows instead of a pass over the tree, and it selects
+    // nothing at all on a library that is already up to date.
+    queueOutdatedFingerprints()
+
     await this.drain('hash_state', signal, async (item, absPath) => {
-      const result = await hashItem(absPath, thumbPathFor(item.id), signal)
+      // The size the walk recorded decides the scheme: whole-file below a
+      // gigabyte, the ends above it. See scan/fingerprint.ts.
+      const result = await hashItem(absPath, item.size, thumbPathFor(item.id), signal)
       applyHashResult(item.id, result)
       this.progress.hashed += 1
     })

@@ -9,10 +9,11 @@
  * match (see hashBands for why that's safe).
  */
 
-import type { DuplicateGroup, MediaItem } from '@shared/types'
+import type { DuplicateFingerprintGap, DuplicateGroup, MediaItem } from '@shared/types'
 import { hamming } from './hamming'
 import { getDb } from './index'
 import { getMedia } from './media'
+import { SAMPLE_ABOVE_BYTES } from '../scan/fingerprint'
 import { hashBands, MAX_RELIABLE_DISTANCE } from '../scan/phash'
 
 /** Default Hamming distance for "looks like the same image". */
@@ -20,8 +21,10 @@ export const DEFAULT_DISTANCE = 6
 
 export function findExactDuplicates(): DuplicateGroup[] {
   const rows = getDb()
-    .prepare<[], { content_hash: string; ids: string }>(
-      `SELECT m.content_hash, group_concat(m.id) AS ids
+    .prepare<[], { content_hash: string; sampled: number; ids: string }>(
+      `SELECT m.content_hash,
+              MAX(m.content_sampled) AS sampled,
+              group_concat(m.id)      AS ids
          FROM media m
          JOIN roots r ON r.id = m.root_id
         WHERE m.content_hash IS NOT NULL
@@ -34,8 +37,27 @@ export function findExactDuplicates(): DuplicateGroup[] {
     .all()
 
   return rows
-    .map((row) => buildGroup('exact', row.content_hash, parseIds(row.ids), 0))
+    .map((row) => buildGroup('exact', row.content_hash, parseIds(row.ids), 0, row.sampled === 1))
     .filter((group): group is DuplicateGroup => group !== null)
+}
+
+/** How many files are short of a fingerprint, split by why. */
+export function fingerprintGap(): DuplicateFingerprintGap {
+  const row = getDb()
+    .prepare<[number], { pending: number; outdated: number }>(
+      `SELECT
+         SUM(CASE WHEN m.hash_state = 'pending' THEN 1 ELSE 0 END) AS pending,
+         SUM(CASE WHEN m.hash_state = 'done'
+                   AND m.content_hash IS NOT NULL
+                   AND m.content_sampled <> (CASE WHEN m.size >= ? THEN 1 ELSE 0 END)
+                  THEN 1 ELSE 0 END) AS outdated
+         FROM media m
+         JOIN roots r ON r.id = m.root_id
+        WHERE m.missing = 0 AND r.enabled = 1`,
+    )
+    .get(SAMPLE_ABOVE_BYTES)
+
+  return { pending: row?.pending ?? 0, outdated: row?.outdated ?? 0 }
 }
 
 export function findNearDuplicates(distance = DEFAULT_DISTANCE): DuplicateGroup[] {
@@ -180,6 +202,7 @@ function buildGroup(
   key: string,
   ids: number[],
   distance: number,
+  sampled = false,
 ): DuplicateGroup | null {
   const items = ids
     .map((id) => getMedia(id))
@@ -195,6 +218,7 @@ function buildGroup(
     key,
     kind,
     distance,
+    sampled,
     items,
     // What you'd reclaim by keeping exactly one.
     reclaimable: items.slice(1).reduce((total, item) => total + item.size, 0),

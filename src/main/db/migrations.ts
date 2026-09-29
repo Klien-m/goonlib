@@ -329,4 +329,21 @@ export const migrations: Migration[] = [
       CREATE INDEX idx_collection_tags_tag ON collection_tags(tag_id);
     `,
   },
+  {
+    version: 13,
+    name: 'content-sampled',
+    sql: /* sql */ `
+      -- Whether content_hash covers the whole file or only its ends.
+      --
+      -- Films are fingerprinted from their length plus their first and last 8MB
+      -- instead of being read whole; see scan/fingerprint.ts. The distinction has
+      -- to survive to the duplicates screen, because "these two are byte-for-byte
+      -- identical" is a claim that can get a file deleted, and it is only true
+      -- when both digests covered everything.
+      --
+      -- Existing rows default to 0: they were hashed whole, before this column
+      -- existed, and the scan resets the ones it now hashes differently.
+      ALTER TABLE media ADD COLUMN content_sampled INTEGER NOT NULL DEFAULT 0;
+    `,
+  },
 ]

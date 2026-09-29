@@ -69,11 +69,10 @@ import {
   setCollectionCover,
 } from './db/collections'
 import { setFavorite } from './db/favorites'
-import { findExactDuplicates, findNearDuplicates } from './db/duplicates'
+import { findExactDuplicates, findNearDuplicates, fingerprintGap } from './db/duplicates'
 import { listChildFolders } from './db/folders'
 import { listAnnotations, queueForClassification, resetClassification } from './db/labels'
 import {
-  countPending,
   forgetMedia,
   getMedia,
   listExtensions,
@@ -251,7 +250,7 @@ handle(IPC.collectionsTags, (_event, id: number): number[] => collectionTags(Num
   handle(IPC.duplicatesFind, (_event, distance?: number): DuplicateReport => ({
     exact: findExactDuplicates(),
     near: findNearDuplicates(distance ?? duplicateDistance()),
-    pending: countPending('hash_state'),
+    pending: fingerprintGap(),
   }))
 
   handle(IPC.duplicatesDistance, (): number => duplicateDistance())

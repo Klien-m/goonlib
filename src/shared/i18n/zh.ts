@@ -573,6 +573,8 @@ export const zh: Catalogue = {
   'Dupes.error': '无法检查重复项',
   'Dupes.none': '没有发现重复项',
   'Dupes.none.pending': '还有 {count} 项没有计算指纹,所以这不是全貌。跑一次扫描就能补全。',
+  'Dupes.none.outdated':
+    '有 {count} 个影片是旧版本算的指纹,所以这不是全貌。跑一次扫描就会重新读取。',
   'Dupes.none.distinct': '媒体库里的每个文件都是独一无二的。',
   'Dupes.rescan': '重新扫描',
   'Dupes.rescan.title': '重新查找重复项,包括之后增删的',
@@ -580,6 +582,9 @@ export const zh: Catalogue = {
   'Dupes.found': '找到 {count} 组重复',
   'Dupes.reclaimable': '可释放 {size}',
   'Dupes.pending': '{count} 项尚未计算指纹',
+  'Dupes.outdated': '{count} 项待重新读取',
+  'Dupes.outdated.title':
+    '这个版本之前加入的影片是被完整读过的。下次扫描会改成只取首尾两端算指纹,很快但不是瞬间完成。',
   'Dupes.selected': '已选 {count} 项',
   'Dupes.spared': '保留了 {count} 个收藏',
   'Dupes.spared.title': '收藏的副本会替代最大的那个被留下。取消勾选就会把它也算进去。',
@@ -591,6 +596,9 @@ export const zh: Catalogue = {
   'Dupes.moving': '移动中…',
   'Dupes.move.title': '确认后把选中的文件移到系统废纸篓',
   'Dupes.identical': '完全相同',
+  'Dupes.sampled': '首尾一致',
+  'Dupes.sampled.title':
+    '这些是大文件,指纹取的是文件长度加首尾各 8MB,而不是完整读取。真正相同的文件一定会命中,但不同的文件也有可能撞上 —— 所以说的是「首尾一致」而不是「完全相同」。',
   'Dupes.similar': '相似 · {distance} 位',
   'Dupes.copies': '{count} 个副本 · 可释放 {size}',
   'Dupes.allButLargest': '全选,只留最大的',
