@@ -45,6 +45,7 @@ const DEFAULTS = {
   showDescription: true,
   showCaption: true,
   showTags: true,
+  buildSprites: false,
   loop: false,
   keepHistory: true,
   resumePosition: true,
@@ -68,6 +69,17 @@ describe('playback preference', () => {
   it('turns back on', () => {
     setPlaybackPrefs({ autoplay: false })
     expect(setPlaybackPrefs({ autoplay: true }).autoplay).toBe(true)
+  })
+
+  /**
+   * The sprite switch is the one setting whose whole point is that it costs
+   * nothing until it is asked for, so the default is the assertion that matters.
+   */
+  it('does not build sprites until asked', () => {
+    expect(playbackPrefs().buildSprites).toBe(false)
+    expect(setPlaybackPrefs({ buildSprites: true }).buildSprites).toBe(true)
+    expect(playbackPrefs().buildSprites).toBe(true)
+    expect(setPlaybackPrefs({ buildSprites: false }).buildSprites).toBe(false)
   })
 
   it('ignores the old autoplay-next row a previous version left behind', () => {

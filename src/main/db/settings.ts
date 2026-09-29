@@ -34,6 +34,7 @@ export const SETTING_SHOW_LOCATION = 'playback.showLocation'
 export const SETTING_SHOW_DESCRIPTION = 'playback.showDescription'
 export const SETTING_SHOW_CAPTION = 'playback.showCaption'
 export const SETTING_SHOW_TAGS = 'playback.showTags'
+export const SETTING_BUILD_SPRITES = 'playback.buildSprites'
 export const SETTING_LOOP = 'playback.loop'
 export const SETTING_KEEP_HISTORY = 'playback.keepHistory'
 export const SETTING_RESUME = 'playback.resumePosition'
@@ -159,6 +160,8 @@ export function playbackPrefs(): PlaybackPrefs {
     showDescription: getSetting(SETTING_SHOW_DESCRIPTION) !== '0',
     showCaption: getSetting(SETTING_SHOW_CAPTION) !== '0',
     showTags: getSetting(SETTING_SHOW_TAGS) !== '0',
+    // Off unless turned on. It costs the most and is worth the least.
+    buildSprites: getSetting(SETTING_BUILD_SPRITES) === '1',
     loop: getSetting(SETTING_LOOP) === '1',
     keepHistory: getSetting(SETTING_KEEP_HISTORY) !== '0',
     resumePosition: getSetting(SETTING_RESUME) !== '0',
@@ -223,6 +226,9 @@ export function setPlaybackPrefs(patch: Partial<PlaybackPrefs>): PlaybackPrefs {
     setSetting(SETTING_SHOW_CAPTION, patch.showCaption ? '1' : '0')
   }
   if (patch.showTags !== undefined) setSetting(SETTING_SHOW_TAGS, patch.showTags ? '1' : '0')
+  if (patch.buildSprites !== undefined) {
+    setSetting(SETTING_BUILD_SPRITES, patch.buildSprites ? '1' : '0')
+  }
   if (patch.loop !== undefined) setSetting(SETTING_LOOP, patch.loop ? '1' : '0')
   if (patch.keepHistory !== undefined) {
     setSetting(SETTING_KEEP_HISTORY, patch.keepHistory ? '1' : '0')

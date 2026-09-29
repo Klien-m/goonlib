@@ -30,7 +30,7 @@ import {
 } from '../db/media'
 import type { PendingItem, StageColumn, UpsertEntry } from '../db/media'
 import { listRoots } from '../db/queries'
-import { aiReady, aiSettings } from '../db/settings'
+import { aiReady, aiSettings, playbackPrefs } from '../db/settings'
 import { resolveWithinRoot } from '../protocol/confine'
 import { hashItem } from './hash'
 import { probeFile } from './probe'
@@ -247,22 +247,29 @@ export class Indexer extends EventEmitter {
       this.progress.thumbed += 1
     })
 
-    this.setPhase('previewing')
-    await this.drain('sprite_state', signal, async (item, absPath) => {
-      // Images have nothing to scrub through.
-      if (item.kind !== 'video') {
-        applySpriteResult(item.id, null)
-        return
-      }
+    // The one stage that can be left out entirely. Read per scan, like the AI
+    // settings, so flipping the switch takes effect on the next pass rather than
+    // halfway through this one. Left off, the rows stay pending: turning it on
+    // later gives the next scan the whole backlog, the same way classification
+    // does.
+    if (playbackPrefs().buildSprites) {
+      this.setPhase('previewing')
+      await this.drain('sprite_state', signal, async (item, absPath) => {
+        // Images have nothing to scrub through.
+        if (item.kind !== 'video') {
+          applySpriteResult(item.id, null)
+          return
+        }
 
-      const layout = await generateSprite(
-        { absPath, durationMs: item.durationMs },
-        spritePathFor(item.id),
-        signal,
-      )
-      applySpriteResult(item.id, layout)
-      this.progress.previewed += 1
-    })
+        const layout = await generateSprite(
+          { absPath, durationMs: item.durationMs },
+          spritePathFor(item.id),
+          signal,
+        )
+        applySpriteResult(item.id, layout)
+        this.progress.previewed += 1
+      })
+    }
 
     this.setPhase('hashing')
     await this.drain('hash_state', signal, async (item, absPath) => {

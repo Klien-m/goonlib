@@ -112,6 +112,9 @@ export const en: Catalogue = {
     "Shows a photo's EXIF data, if it has any: camera, lens, settings and the date it was taken.",
   'App.player.showLocation': 'Include Location',
   'App.player.showLocation.hint': 'Whether to also include location information in shown EXIF data',
+  'App.player.buildSprites': 'Build hover previews',
+  'App.player.buildSprites.hint':
+    'Makes the frame strip a video scrubs through when you move the cursor across its card. Costs up to forty seeks and decodes per video - the slowest part of a scan by far - so it is off by default. Videos keep their cover either way.',
 
   'App.history.label': 'Watch history',
   'App.history.keep': 'Keep watch history',
